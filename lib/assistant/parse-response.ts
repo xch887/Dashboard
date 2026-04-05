@@ -36,16 +36,18 @@ export function parseAssistantStructuredResponse(
   if (typeof data !== "object" || data === null) return null;
   const o = data as Record<string, unknown>;
 
-  if (typeof o.explanation !== "string") return null;
+  if (typeof o.headline !== "string") return null;
+  if (typeof o.situation !== "string") return null;
   if (typeof o.reasoning_label !== "string") return null;
   if (typeof o.confidence !== "string" || !isConfidence(o.confidence))
     return null;
 
-  if (!Array.isArray(o.likely_reasons)) return null;
-  const likely_reasons = o.likely_reasons.filter(
+  if (!Array.isArray(o.key_factors)) return null;
+  const key_factors = o.key_factors.filter(
     (x): x is string => typeof x === "string"
   );
-  if (likely_reasons.length !== o.likely_reasons.length) return null;
+  if (key_factors.length !== o.key_factors.length) return null;
+  if (key_factors.length < 1 || key_factors.length > 5) return null;
 
   if (!Array.isArray(o.suggested_actions)) return null;
   const suggested_actions: SuggestedAction[] = [];
@@ -62,8 +64,9 @@ export function parseAssistantStructuredResponse(
   if (follow_up_questions.length !== o.follow_up_questions.length) return null;
 
   return {
-    explanation: o.explanation,
-    likely_reasons,
+    headline: o.headline,
+    situation: o.situation,
+    key_factors,
     reasoning_label: o.reasoning_label,
     confidence: o.confidence,
     suggested_actions,

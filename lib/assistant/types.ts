@@ -16,12 +16,20 @@ export type SuggestedAction = {
   description: string;
 };
 
+/** Structured output from Operations Copilot (matches JSON schema + UI sections). */
 export type AssistantStructuredResponse = {
-  explanation: string;
-  likely_reasons: string[];
+  /** HEADLINE: one decisive recommendation (what to do now). */
+  headline: string;
+  /** SITUATION: 2–3 sentences of context only. */
+  situation: string;
+  /** KEY FACTORS: 2–3 bullets; each ties a metric to a “so what.” */
+  key_factors: string[];
+  /** One line: what you prioritized first (safety, throughput, compliance, cost) and why. */
   reasoning_label: string;
   confidence: "high" | "medium" | "low";
+  /** SUGGESTED ACTIONS: decisions with who / what / when; use Escalate, Page, Reassign, etc. */
   suggested_actions: SuggestedAction[];
+  /** FOLLOW-UPS: sharper tradeoff questions, not “want more detail?” */
   follow_up_questions: string[];
 };
 

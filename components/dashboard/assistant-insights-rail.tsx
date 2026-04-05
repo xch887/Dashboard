@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 const insights = [
   {
     title: "Throughput delay risk",
-    body: "OR block trending below target — consider reallocating recovery staff.",
+    body: "Recovery staffing looks light for today’s OR block — adjust if cases run long.",
     action: "Reallocate staff",
     confidence: 87,
     level: "High" as const,
@@ -29,7 +29,7 @@ const insights = [
   },
   {
     title: "Device performance slip",
-    body: "ICU West infusion pumps — elevated retries after firmware push.",
+    body: "ICU West pumps are retrying more often after the last firmware update.",
     action: "Schedule diagnostic",
     confidence: 92,
     level: "High" as const,
@@ -38,7 +38,7 @@ const insights = [
   },
   {
     title: "Calibration drift cluster",
-    body: "Telemetry batch on 4 West — model flags drift vs. last OEM baseline.",
+    body: "Telemetry on 4 West is drifting from the last vendor baseline — review calibrations.",
     action: "Open calibration queue",
     confidence: 76,
     level: "Med" as const,
