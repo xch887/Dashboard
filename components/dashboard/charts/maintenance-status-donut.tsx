@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { dashboardTileOutline, dashboardTileShadow } from "@/lib/dashboard-surface";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
 import { RefreshCw } from "lucide-react";
 
 const CX = 100;
@@ -86,14 +86,16 @@ export function MaintenanceStatusDonut({
   return (
     <Card
       className={cn(
-        "rounded-lg bg-white",
-        dashboardTileOutline,
-        dashboardTileShadow,
+        dashboardCardClass,
+        "gap-0 py-0",
         compact && "h-full"
       )}
     >
       <CardHeader
-        className={cn("border-b border-black/10 pb-3", compact && "pb-2")}
+        className={cn(
+          "border-b border-slate-100",
+          compact ? "px-5 pb-3 pt-5" : "px-6 pb-4 pt-6"
+        )}
       >
         <CardTitle className="text-base font-semibold text-slate-900">
           Maintenance status

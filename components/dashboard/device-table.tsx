@@ -25,7 +25,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { dashboardTileOutline, dashboardTileShadow } from "@/lib/dashboard-surface";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
 import {
   AlertCircle,
   AlertTriangle,
@@ -531,12 +531,11 @@ export function DeviceTable({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-lg bg-white",
-        dashboardTileOutline,
-        dashboardTileShadow
+        "overflow-hidden",
+        dashboardCardClass
       )}
     >
-      <div className="flex flex-col gap-2.5 border-b border-black/10 bg-slate-50/40 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2.5 border-b border-slate-100 bg-slate-50/50 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2.5">
           <h2 className="text-[15px] font-bold leading-tight tracking-tight text-slate-950">
             Device Action Queue

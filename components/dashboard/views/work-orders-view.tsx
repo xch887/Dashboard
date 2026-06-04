@@ -758,7 +758,7 @@ export function WorkOrdersView() {
         </div>
       </SectionCard>
 
-      <div className="grid min-h-[480px] gap-4 lg:grid-cols-[minmax(0,360px)_1fr]">
+      <div className="grid min-h-[480px] gap-x-2.5 gap-y-3 lg:grid-cols-[minmax(0,360px)_1fr]">
         <SectionCard className="flex flex-col overflow-hidden p-0">
           <div className="border-b border-slate-100 px-4 py-3">
             <div className="flex items-center justify-between gap-2">
@@ -976,7 +976,7 @@ export function WorkOrdersView() {
                 </div>
               </div>
               <div className="flex-1 space-y-5 px-5 py-5">
-                <dl className="grid gap-3 sm:grid-cols-2">
+                <dl className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2">
                   <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
                     <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                       Device / scope

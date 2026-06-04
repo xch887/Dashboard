@@ -69,7 +69,7 @@ export function DashboardSuggestedActions({
           Prioritized from telemetry, PM backlog, and vendor signals.
         </p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2">
         {SUGGESTIONS.map((s) => {
           const Icon = s.icon;
           return (

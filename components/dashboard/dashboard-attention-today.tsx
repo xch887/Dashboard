@@ -61,8 +61,8 @@ const tone: Record<
   { bar: string; badge: string; icon: typeof ShieldAlert }
 > = {
   critical: {
-    bar: "bg-rose-500",
-    badge: "bg-rose-100 text-rose-900 ring-rose-200/80",
+    bar: "bg-red-600",
+    badge: "bg-red-100 text-red-900 ring-red-200/80",
     icon: ShieldAlert,
   },
   soon: {
@@ -117,7 +117,7 @@ export function DashboardAttentionToday({
               className={cn(
                 "flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50/40 p-3.5 shadow-sm ring-1 ring-slate-100 transition-shadow duration-200 sm:flex-row sm:items-center sm:justify-between sm:gap-4",
                 "hover:shadow-md",
-                i === 0 && "border-rose-100/80 bg-rose-50/30 ring-rose-100/60"
+                i === 0 && "border-red-100/80 bg-red-50/30 ring-red-100/60"
               )}
             >
               <div className="flex min-w-0 flex-1 gap-3">
@@ -149,7 +149,7 @@ export function DashboardAttentionToday({
                 className={cn(
                   "h-9 shrink-0 font-semibold sm:min-w-[128px]",
                   item.urgency === "critical"
-                    ? "bg-rose-600 hover:bg-rose-700"
+                    ? "bg-red-600 hover:bg-red-700"
                     : "bg-blue-600 hover:bg-blue-700"
                 )}
                 onClick={() =>

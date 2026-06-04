@@ -330,7 +330,7 @@ export function TrendsView() {
         </p>
       </SectionCard>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
         {displayStats.map((s) => (
           <StatCard
             key={s.label}
@@ -378,7 +378,7 @@ export function TrendsView() {
             </FilterPill>
           </div>
         </div>
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
           {filteredRisk.map((d) => (
             <li
               key={d.id}
@@ -461,7 +461,7 @@ export function TrendsView() {
             </p>
           </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
           {FORECAST_WINDOWS.map((f) => (
             <button
               key={f.key}
@@ -536,7 +536,7 @@ export function TrendsView() {
         </div>
       </SectionCard>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-x-2.5 gap-y-3 lg:grid-cols-2">
         <SectionCard as="section">
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <BatteryWarning className="h-4 w-4 text-amber-600" aria-hidden />

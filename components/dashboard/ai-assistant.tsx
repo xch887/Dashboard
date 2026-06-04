@@ -10,7 +10,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Bot, Send, Sparkles } from "lucide-react";
+import { OperationsIntelligenceEmblem } from "@/components/dashboard/operations-intelligence-icon";
+import { Bot, Send } from "lucide-react";
 
 const mockMessages = [
   {
@@ -39,7 +40,7 @@ export function AiAssistant() {
           size="sm"
           className="fixed bottom-6 right-6 bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-900/30 gap-2 rounded-full px-4 py-5"
         >
-          <Sparkles className="w-4 h-4" />
+          <OperationsIntelligenceEmblem className="h-4 w-4" />
           AI Assistant
         </Button>
       </SheetTrigger>

@@ -26,10 +26,15 @@
   --color-health-healthy-muted: #ccfbf1;
   --color-health-warning: #ea580c;
   --color-health-warning-muted: #ffedd5;
-  --color-health-critical: #e11d48;
-  --color-health-critical-muted: #ffe4e6;
+  --color-health-critical: #dc2626;
+  --color-health-critical-muted: #fef2f2;
   --color-health-info: #2563eb;
   --color-health-info-muted: #dbeafe;
+
+  /* Shadcn semantic tokens — required for bg-background, border-background, etc. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
 }
 
 :root {
@@ -55,7 +60,7 @@
   --muted-foreground: #64748b;
   --accent: #eff6ff;
   --accent-foreground: #1d4ed8;
-  --destructive: #e11d48;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e2e8f0;
   --input: #e2e8f0;
@@ -78,9 +83,8 @@ body {
   text-rendering: optimizeLegibility;
   background-color: var(--background);
   background-image:
-    radial-gradient(980px 460px at 0% -4%, rgb(37 99 235 / 0.06), transparent 58%),
-    radial-gradient(680px 400px at 100% 0%, rgb(14 165 233 / 0.045), transparent 52%),
-    linear-gradient(180deg, rgb(255 255 255 / 0.7) 0%, transparent 40%);
+    radial-gradient(980px 460px at 0% -4%, rgb(37 99 235 / 0.04), transparent 58%),
+    radial-gradient(680px 400px at 100% 0%, rgb(14 165 233 / 0.03), transparent 52%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

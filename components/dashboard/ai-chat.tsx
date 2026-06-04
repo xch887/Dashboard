@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, Mic, Paperclip, Search, Sparkles } from "lucide-react";
+import { OperationsIntelligenceEmblem } from "@/components/dashboard/operations-intelligence-icon";
+import { ArrowUp, Mic, Paperclip, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const suggestions = [
@@ -62,8 +63,8 @@ export function AiChat() {
               <div className="relative z-10 rounded-3xl border border-slate-200/90 bg-white/95">
                 <div className="flex flex-col px-5 pb-8 pt-10 sm:px-8 sm:pt-12">
                   <div className="mb-8 text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-900/25">
-                      <Sparkles className="h-6 w-6" aria-hidden />
+                    <div className="mx-auto mb-4 flex justify-center">
+                      <OperationsIntelligenceEmblem className="h-12 w-12 sm:h-14 sm:w-14" />
                     </div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-[1.65rem]">
                       AI Operations Intelligence
@@ -163,9 +164,7 @@ export function AiChat() {
       ) : (
         <div className="flex min-h-0 w-full max-w-3xl flex-1 flex-col self-center px-2 py-4 sm:px-4 md:px-5">
           <div className="mb-3 flex items-center gap-2 border-b border-slate-100 pb-3 md:hidden">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
-              <Sparkles className="h-4 w-4" />
-            </div>
+            <OperationsIntelligenceEmblem className="h-9 w-9 shrink-0" />
             <div>
               <p className="text-sm font-semibold text-slate-900">
                 AI Operations Intelligence

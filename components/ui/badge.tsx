@@ -15,7 +15,7 @@ const badgeVariants = cva(
         secondary:
           "border-transparent bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
         destructive:
-          "border-rose-200/90 bg-rose-50 text-rose-800 [a]:hover:bg-rose-100/90",
+          "border-red-200/90 bg-red-50 text-red-800 [a]:hover:bg-red-100/90",
         outline:
           "border-slate-200 bg-white text-slate-700 shadow-none [a]:hover:bg-slate-50",
         ghost:
@@ -31,7 +31,7 @@ const badgeVariants = cva(
           "border-amber-200/90 bg-amber-50 text-amber-900 [a]:hover:bg-amber-100/80",
         /** Pre-cert “Rejected” */
         danger:
-          "border-rose-200/90 bg-rose-50 text-rose-800 [a]:hover:bg-rose-100/80",
+          "border-red-200/90 bg-red-50 text-red-800 [a]:hover:bg-red-100/80",
         /** Pre-cert “Resubmitted” / system */
         process:
           "border-violet-200/90 bg-violet-50 text-violet-900 [a]:hover:bg-violet-100/80",

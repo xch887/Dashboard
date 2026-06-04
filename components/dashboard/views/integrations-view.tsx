@@ -334,7 +334,7 @@ export function IntegrationsView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-2.5 gap-y-3 lg:grid-cols-4">
         {c.stats.map((s) => (
           <div
             key={s.label}

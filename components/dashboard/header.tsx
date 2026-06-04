@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import {
+  dashboardMainInsetX,
+  dashboardMastheadHeight,
+} from "@/lib/dashboard-surface";
 import {
   Search,
   Bell,
@@ -26,32 +30,39 @@ import {
   Info,
 } from "lucide-react";
 
+const headerIconButtonClass =
+  "h-9 w-9 rounded-lg border border-slate-200/80 bg-white text-slate-500 shadow-none hover:bg-slate-50 hover:text-slate-800";
+
 export function Header() {
   return (
-    <header className="flex h-[3.25rem] items-center justify-between gap-3 border-b border-slate-200/60 bg-white px-4 sm:gap-4 sm:px-6">
+    <header
+      className={cn(
+        "flex items-center gap-4 bg-white sm:gap-5",
+        dashboardMastheadHeight,
+        dashboardMainInsetX
+      )}
+    >
       <div
         className={cn(
-          "relative min-w-0 flex-1 rounded-lg",
-          "transition-[box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-out)]",
-          "has-[input:focus-visible]:shadow-[0_0_0_3px_rgb(59_130_246/0.12)]"
+          "relative flex h-9 w-full max-w-[23rem] shrink-0 items-center gap-3 rounded-lg border border-slate-200 bg-white pl-3 pr-2 shadow-none ring-0 sm:max-w-[26rem]",
+          "transition-[box-shadow,border-color] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-out)]",
+          "has-[input:focus-visible]:border-blue-300 has-[input:focus-visible]:shadow-[0_0_0_3px_rgb(59_130_246/0.12)] has-[input:focus-visible]:ring-1 has-[input:focus-visible]:ring-blue-500/25"
         )}
       >
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+        <Search className="h-3.5 w-3.5 shrink-0 text-slate-500" aria-hidden />
         <Input
-          placeholder="Search devices, work orders, people…"
-          className="h-9 rounded-lg border-slate-200/80 bg-slate-50/90 pl-10 pr-3 text-sm leading-normal text-slate-800 placeholder:text-slate-400 shadow-[inset_0_1px_0_rgb(0_0_0/0.02)] transition-[border-color,box-shadow] focus-visible:border-blue-300/70 focus-visible:ring-blue-500/25 sm:pr-[4.25rem]"
+          placeholder="Search"
+          className="h-full min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm leading-normal text-slate-800 shadow-none placeholder:text-slate-400 focus-visible:border-transparent focus-visible:ring-0"
         />
-        <kbd className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded-md border border-slate-200/90 bg-slate-50 px-2 py-0.5 font-sans text-[0.625rem] font-medium tracking-wide text-slate-500 shadow-[0_1px_0_rgb(0_0_0/0.03)] sm:inline-block">
-          ⌘F
+        <kbd className="pointer-events-none hidden shrink-0 rounded-md border border-slate-200/90 bg-slate-50 px-1.5 py-0.5 font-sans text-[0.625rem] font-medium tracking-wide text-slate-500 sm:inline-block">
+          ⌘ + F
         </kbd>
       </div>
 
-      <div className="flex shrink-0 items-center gap-0.5">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-lg text-slate-500 hover:bg-slate-100/90 hover:text-slate-800"
-        >
+      <div className="min-w-0 flex-1" aria-hidden />
+
+      <div className="flex shrink-0 items-center gap-1.5">
+        <Button variant="ghost" size="icon" className={headerIconButtonClass}>
           <Mail className="h-[17px] w-[17px]" />
         </Button>
         <DropdownMenu>
@@ -59,11 +70,11 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="relative h-9 w-9 rounded-lg text-slate-500 hover:bg-slate-100/90 hover:text-slate-800"
+              className={cn(headerIconButtonClass, "relative")}
               aria-label="Notifications"
             >
               <Bell className="h-[17px] w-[17px]" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-600 ring-2 ring-white" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -82,9 +93,9 @@ export function Header() {
               <li>
                 <Link
                   href="/alerts"
-                  className="flex gap-2.5 px-3 py-2.5 text-left text-sm transition-colors hover:bg-rose-50/80"
+                  className="flex gap-2.5 px-3 py-2.5 text-left text-sm transition-colors hover:bg-red-50/80"
                 >
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
                   <span className="min-w-0">
                     <span className="font-semibold text-slate-900">
                       Critical: Vent alarm parity
@@ -144,18 +155,24 @@ export function Header() {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <div className="mx-1 hidden h-6 w-px bg-slate-200 sm:block" aria-hidden />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="ml-1 flex h-9 shrink-0 items-center gap-2 rounded-lg border border-slate-200/80 bg-slate-50/90 px-1.5 py-0 pr-2 text-sm shadow-none outline-none transition-colors hover:bg-slate-100/90 focus-visible:ring-2 focus-visible:ring-blue-500/35 focus-visible:ring-offset-2 data-[state=open]:bg-slate-100/90 sm:pr-2.5"
+              className="ml-0.5 flex h-9 shrink-0 items-center gap-2 rounded-lg border border-slate-200/80 bg-white px-1.5 py-0 pr-2 text-sm shadow-none outline-none transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500/35 focus-visible:ring-offset-2 data-[state=open]:bg-slate-50 sm:pr-2.5"
             >
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-sky-100 ring-1 ring-slate-200/60">
-                <span className="text-[11px] font-semibold leading-none text-blue-800">
-                  MR
-                </span>
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-slate-200/60">
+                <Image
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=64&h=64&fit=crop&crop=faces&auto=format&q=80"
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="h-full w-full object-cover"
+                />
               </div>
-              <span className="hidden max-w-[11rem] whitespace-nowrap font-normal leading-snug text-slate-800 sm:inline">
+              <span className="hidden max-w-[9rem] whitespace-nowrap font-normal leading-snug text-slate-800 sm:inline">
                 Morgan Reyes
               </span>
               <ChevronDown className="hidden h-4 w-4 shrink-0 text-slate-400 sm:block" />

@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { OperationsIntelligenceEmblem } from "@/components/dashboard/operations-intelligence-icon";
 import { cn } from "@/lib/utils";
 
 /** Marks copy that reads as model- or AI-assisted operational insight. */
@@ -10,7 +10,7 @@ export function InsightBadge({ className }: { className?: string }) {
         className
       )}
     >
-      <Sparkles className="h-3 w-3 shrink-0 text-blue-600" aria-hidden />
+      <OperationsIntelligenceEmblem className="h-3 w-3" />
       <span aria-hidden>Insight</span>
       <span className="sr-only">AI-assisted operational insight</span>
     </span>

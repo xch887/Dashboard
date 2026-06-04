@@ -9,14 +9,12 @@ export function structuredToConversationContent(
   s: AssistantStructuredResponse
 ): string {
   return [
-    s.headline,
+    s.explanation,
     "",
-    s.situation,
+    "Contributing factors:",
+    ...s.likely_reasons.map((r) => `• ${r}`),
     "",
-    "Key factors:",
-    ...s.key_factors.map((r) => `• ${r}`),
-    "",
-    `Prioritization: ${s.reasoning_label}`,
+    `Reasoning label: ${s.reasoning_label}`,
     `Confidence: ${s.confidence}`,
   ].join("\n");
 }
@@ -38,12 +36,12 @@ export function intelligenceThreadToApiMessages(
 export function formatIntelligenceFabSummary(
   s: AssistantStructuredResponse
 ): string {
-  const slice = s.key_factors.slice(0, 3);
+  const slice = s.likely_reasons.slice(0, 3);
   const tail =
     slice.length > 0
       ? `\n\n${slice.map((r) => `• ${r}`).join("\n")}${
-          s.key_factors.length > 3 ? "\n• …" : ""
+          s.likely_reasons.length > 3 ? "\n• …" : ""
         }`
       : "";
-  return `${s.headline}${tail}`;
+  return `${s.explanation}${tail}`;
 }

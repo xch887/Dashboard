@@ -344,7 +344,7 @@ export function ReportsView() {
               </Button>
             </div>
           </div>
-          <div className="grid shrink-0 gap-3 sm:grid-cols-2 lg:w-[280px]">
+          <div className="grid shrink-0 gap-x-2.5 gap-y-3 sm:grid-cols-2 lg:w-[280px]">
             <div className="rounded-xl border border-white/10 bg-white/5 p-3 backdrop-blur-sm">
               <Mail className="h-5 w-5 text-blue-300" aria-hidden />
               <p className="mt-2 text-xs font-semibold">Email delivery</p>
@@ -363,7 +363,7 @@ export function ReportsView() {
         </div>
       </section>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
         {c.stats.map((s) => (
           <div
             key={s.label}
@@ -420,7 +420,7 @@ export function ReportsView() {
             No templates match this filter.
           </p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2 xl:grid-cols-4">
             {filteredTemplates.map((t) => (
               <button
                 key={t.id}

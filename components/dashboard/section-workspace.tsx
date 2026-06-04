@@ -25,7 +25,7 @@ export function SectionWorkspace({ config }: { config: SectionPageConfig }) {
       />
 
       <section aria-label="Key metrics">
-        <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        <ul className="grid grid-cols-2 gap-x-2.5 gap-y-3 lg:grid-cols-4">
           {config.stats.map((stat) => (
             <li key={stat.label}>
               <StatCard
@@ -45,7 +45,7 @@ export function SectionWorkspace({ config }: { config: SectionPageConfig }) {
             Demo — wire to real flows later
           </span>
         </div>
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2">
           {config.tiles.map((tile) => {
             const TileIcon = tile.icon;
             return (

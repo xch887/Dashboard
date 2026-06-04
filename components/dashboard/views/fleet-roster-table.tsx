@@ -600,8 +600,8 @@ export function FleetRosterTable() {
   return (
     <>
     <Table>
-      <TableHeader>
-        <TableRow className="border-slate-100 bg-slate-50/30 hover:bg-transparent">
+      <TableHeader className="bg-white">
+        <TableRow className="border-b border-slate-200/80 bg-white hover:bg-white">
           <SortableHead
             label="Rank"
             col="priority"

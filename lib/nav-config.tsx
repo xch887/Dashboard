@@ -1,8 +1,9 @@
+import type { ComponentType } from "react";
 import type { IconType } from "react-icons";
+import { OperationsIntelligenceNavIcon } from "@/components/dashboard/operations-intelligence-icon";
 import {
   MdAssignment,
   MdBarChart,
-  MdBubbleChart,
   MdBuild,
   MdBusiness,
   MdCalendarToday,
@@ -12,7 +13,6 @@ import {
   MdLocationOn,
   MdOutlineAssignment,
   MdOutlineBarChart,
-  MdOutlineBubbleChart,
   MdOutlineBuild,
   MdOutlineBusiness,
   MdOutlineCalendarToday,
@@ -34,12 +34,14 @@ import {
   MdWarning,
 } from "react-icons/md";
 
+type NavIcon = IconType | ComponentType<{ className?: string }>;
+
 export type NavItem = {
   label: string;
   /** Material-style: outlined when route inactive. */
-  iconOutline: IconType;
+  iconOutline: NavIcon;
   /** Material-style: filled when route active. */
-  iconFilled: IconType;
+  iconFilled: NavIcon;
   href: string;
   badge?: number;
   /** Sidebar badge color by highest-severity item in that queue (demo). */
@@ -62,8 +64,8 @@ const navSectionsSource: NavSectionData[] = [
     items: [
       {
         label: "Intelligence",
-        iconOutline: MdOutlineBubbleChart,
-        iconFilled: MdBubbleChart,
+        iconOutline: OperationsIntelligenceNavIcon,
+        iconFilled: OperationsIntelligenceNavIcon,
         href: "/assistant",
       },
       {

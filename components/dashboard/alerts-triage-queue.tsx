@@ -21,6 +21,12 @@ import {
   UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
+import { SectionCard } from "@/components/dashboard/section-card";
+import {
+  sectionDescriptionClass,
+  sectionHeadingClass,
+} from "@/components/dashboard/view-page";
 
 export type AlertSeverity = "critical" | "high" | "medium" | "low";
 
@@ -56,7 +62,7 @@ const SEVERITY_ORDER: Record<AlertSeverity, number> = {
 };
 
 const severityDot: Record<AlertSeverity, string> = {
-  critical: "bg-rose-500 ring-rose-200",
+  critical: "bg-red-600 ring-red-200",
   high: "bg-orange-500 ring-orange-200",
   medium: "bg-amber-400 ring-amber-100",
   low: "bg-slate-400 ring-slate-200",
@@ -318,17 +324,18 @@ export function AlertsTriageQueue() {
     deptFilter !== "all";
 
   return (
-    <section
-      className="rounded-2xl border border-slate-200/80 bg-white/85 p-5 shadow-sm ring-1 ring-slate-200/50"
+    <SectionCard
+      as="section"
+      className="p-4 sm:p-5"
       aria-label="Incident triage queue"
     >
-      <div className="mb-5 flex flex-col gap-4">
+      <div className="mb-4 flex flex-col gap-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-slate-900">
+            <h2 className={sectionHeadingClass}>
               Triage queue — critical first
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className={cn(sectionDescriptionClass, "mt-1")}>
               Filter by severity, status, or department. Assign owners and open
               the linked device on the fleet roster.
             </p>
@@ -340,7 +347,7 @@ export function AlertsTriageQueue() {
           </p>
         </div>
 
-        <div className="grid gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-3 sm:p-4 xl:grid-cols-3 xl:gap-4">
+        <div className="grid gap-3 rounded-lg bg-slate-50/80 p-3 sm:p-3.5 xl:grid-cols-3 xl:gap-4">
           <div className="flex min-w-0 flex-col gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
               Severity
@@ -435,9 +442,9 @@ export function AlertsTriageQueue() {
         </div>
       </div>
 
-      <ul className="space-y-4" role="list">
+      <ul className="space-y-3" role="list">
         {filtered.length === 0 ? (
-          <li className="rounded-lg border border-dashed border-slate-200 bg-slate-50/50 px-4 py-8 text-center text-sm text-slate-500">
+          <li className="rounded-lg border border-dashed border-slate-200/80 bg-slate-50/60 px-4 py-8 text-center text-sm text-slate-500">
             No incidents match these filters.
           </li>
         ) : null}
@@ -457,11 +464,11 @@ export function AlertsTriageQueue() {
             >
               <div
                 className={cn(
-                  "overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm ring-1 transition-shadow duration-200",
-                  "hover:shadow-md",
-                  isCritical && "border-l-4 border-l-rose-600 ring-rose-100/50",
-                  isHigh && "border-l-4 border-l-orange-500 ring-orange-100/40",
-                  subdued && "ring-slate-100/80"
+                  dashboardCardClass,
+                  "overflow-hidden transition-shadow duration-200",
+                  "hover:shadow-[0_16px_48px_-14px_rgb(99_102_241/0.14)]",
+                  isCritical && "border-l-4 border-l-red-600",
+                  isHigh && "border-l-4 border-l-orange-500"
                 )}
               >
                 <div className="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-stretch lg:gap-0 lg:p-0">
@@ -650,6 +657,6 @@ export function AlertsTriageQueue() {
           );
         })}
       </ul>
-    </section>
+    </SectionCard>
   );
 }

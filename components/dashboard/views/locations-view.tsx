@@ -299,7 +299,7 @@ export function LocationsView() {
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
         {c.stats.map((s) => (
           <div
             key={s.label}
@@ -364,7 +364,7 @@ export function LocationsView() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,380px)] lg:items-start">
+      <div className="grid gap-x-2.5 gap-y-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,380px)] lg:items-start">
         <section
           className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm ring-1 ring-slate-200/50"
           aria-labelledby="campus-map-heading"

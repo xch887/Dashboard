@@ -464,7 +464,7 @@ export function AnalyticsView() {
         </Badge>
       </SectionCard>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
         {kpiCards.map((card) => (
           <StatCard
             key={card.label}
@@ -475,7 +475,7 @@ export function AnalyticsView() {
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-x-2.5 gap-y-3 lg:grid-cols-2">
         <SectionCard>
           <MiniAreaChart
             data={uptimeData}
@@ -506,7 +506,7 @@ export function AnalyticsView() {
         </SectionCard>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-x-2.5 gap-y-3 lg:grid-cols-2">
         <SectionCard>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-slate-900">

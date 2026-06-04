@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { sectionConfigs } from "@/lib/section-config";
 import { PageHeader } from "@/components/dashboard/views/page-header";
 import { ViewPage } from "@/components/dashboard/view-page";
+import { OperationsIntelligenceEmblem } from "@/components/dashboard/operations-intelligence-icon";
 import {
   Wrench,
   Calendar,
-  Sparkles,
   Plus,
   Gauge,
   ExternalLink,
@@ -367,7 +367,7 @@ export function MaintenanceView() {
         }
       />
 
-      <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+      <ul className="grid grid-cols-2 gap-x-2.5 gap-y-3 lg:grid-cols-4">
         {stats.map((stat) => (
           <li key={stat.label}>
             <StatCard
@@ -382,9 +382,7 @@ export function MaintenanceView() {
       <section aria-labelledby="ai-insights-heading">
         <HighlightCard>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-md shadow-blue-900/20">
-              <Sparkles className="h-4 w-4" aria-hidden />
-            </div>
+            <OperationsIntelligenceEmblem className="h-9 w-9 shrink-0" />
             <h2
               id="ai-insights-heading"
               className="text-sm font-bold text-slate-950"
@@ -429,7 +427,7 @@ export function MaintenanceView() {
         </HighlightCard>
       </section>
 
-      <div className="grid min-h-[420px] gap-4 lg:grid-cols-[minmax(0,380px)_1fr]">
+      <div className="grid min-h-[420px] gap-x-2.5 gap-y-3 lg:grid-cols-[minmax(0,380px)_1fr]">
         <SectionCard as="section" className="flex flex-col overflow-hidden p-0">
           <div className="border-b border-slate-100 bg-slate-50/50 px-4 py-3">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -613,7 +611,7 @@ export function MaintenanceView() {
                 </div>
               </div>
               <div className="flex-1 space-y-4 px-5 py-5">
-                <dl className="grid gap-3 sm:grid-cols-2">
+                <dl className="grid gap-x-2.5 gap-y-3 sm:grid-cols-2">
                   <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
                     <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                       Due

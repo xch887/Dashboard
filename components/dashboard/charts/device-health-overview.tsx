@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { dashboardTileOutline, dashboardTileShadow } from "@/lib/dashboard-surface";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
 
 const CX = 100;
 const CY = 100;
@@ -90,14 +90,17 @@ export function DeviceHealthOverview({
   return (
     <Card
       className={cn(
-        "h-full rounded-lg bg-white",
-        dashboardTileOutline,
-        dashboardTileShadow,
+        "h-full",
+        dashboardCardClass,
+        "gap-0 py-0",
         compact && "flex flex-col"
       )}
     >
       <CardHeader
-        className={cn("border-b border-black/10", compact ? "py-2" : "pb-3")}
+        className={cn(
+          "border-b border-slate-100",
+          compact ? "px-5 py-4" : "px-6 pb-4 pt-6"
+        )}
       >
         <CardTitle
           className={cn(

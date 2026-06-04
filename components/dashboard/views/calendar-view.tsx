@@ -16,7 +16,6 @@ import {
 import { cn } from "@/lib/utils";
 import {
   SectionCard,
-  TableCard,
 } from "@/components/dashboard/section-card";
 import { InsightBadge } from "@/components/dashboard/insight-badge";
 
@@ -306,12 +305,12 @@ const CALENDAR_INSIGHTS: Record<
 > = {
   "This week": {
     delta: "↑ +12% vs last week",
-    note: "MRI PMs and vendor holds account for most volume.",
+    note: "MRI PMs and vendors drive volume.",
     tone: "up",
   },
   Conflicts: {
     delta: "↓ 1 resolved",
-    note: "2 room overlaps still need a decision.",
+    note: "2 room overlaps need a decision.",
     tone: "warn",
   },
   "Vendor blocks": {
@@ -415,7 +414,7 @@ export function CalendarView() {
         }
       />
 
-      <ul className="grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-3">
+      <ul className="grid auto-rows-fr grid-cols-2 gap-x-2.5 gap-y-3 lg:grid-cols-4">
         {stats.map((s) => {
           const insight = CALENDAR_INSIGHTS[s.label];
           const deltaClass =
@@ -427,37 +426,35 @@ export function CalendarView() {
                   ? "text-amber-800"
                   : "text-slate-600";
           return (
-            <li
-              key={s.label}
-            >
-              <SectionCard>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                {s.label}
-              </p>
-              <p className="mt-1 text-xl font-bold text-slate-900">{s.value}</p>
-              <p className="text-xs text-slate-500">{s.hint}</p>
-              {insight ? (
-                <div className="mt-3 border-t border-slate-100 pt-2">
-                  <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                    <InsightBadge />
+            <li key={s.label} className="flex min-h-0">
+              <SectionCard className="flex h-full w-full flex-col">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  {s.label}
+                </p>
+                <p className="mt-1 text-xl font-bold text-slate-900">{s.value}</p>
+                <p className="text-xs text-slate-500">{s.hint}</p>
+                {insight ? (
+                  <div className="mt-auto min-h-[5.5rem] border-t border-slate-100 pt-3">
+                    <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                      <InsightBadge />
+                    </div>
+                    <p
+                      className={`text-[11px] font-semibold tabular-nums ${deltaClass}`}
+                    >
+                      {insight.delta}
+                    </p>
+                    <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500">
+                      {insight.note}
+                    </p>
                   </div>
-                  <p
-                    className={`text-[11px] font-semibold tabular-nums ${deltaClass}`}
-                  >
-                    {insight.delta}
-                  </p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-slate-500">
-                    {insight.note}
-                  </p>
-                </div>
-              ) : null}
+                ) : null}
               </SectionCard>
             </li>
           );
         })}
       </ul>
 
-      <div className="grid gap-3 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_300px]">
+      <div className="grid gap-x-2.5 gap-y-3 lg:grid-cols-[1fr_280px] lg:items-stretch xl:grid-cols-[1fr_300px]">
         <SectionCard>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-slate-900">
@@ -655,14 +652,14 @@ export function CalendarView() {
           </div>
         </SectionCard>
 
-        <SectionCard className="flex flex-col p-0">
-          <div className="border-b border-slate-100 px-4 pb-3 pt-4 sm:px-5 sm:pb-3 sm:pt-5">
+        <SectionCard className="flex h-full min-h-0 flex-col">
+          <div>
             <h3 className="text-sm font-semibold text-slate-900">
               {selectedKey
                 ? `Events · ${selectedKey}`
                 : "Select a day"}
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500">
               {typeFilter !== "all"
                 ? `Filtered: ${typeFilter} · `
                 : ""}
@@ -673,7 +670,7 @@ export function CalendarView() {
                   : "Pick a date on the grid"}
             </p>
           </div>
-          <ul className="max-h-[min(320px,50vh)] flex-1 space-y-2 overflow-y-auto px-4 py-2 sm:px-5 sm:py-3">
+          <ul className="mt-3 max-h-[min(320px,50vh)] flex-1 space-y-2 overflow-y-auto">
             {selectedEvents.map((ev, idx) => (
               <li
                 key={idx}
@@ -725,7 +722,7 @@ export function CalendarView() {
               </li>
             ) : null}
           </ul>
-          <div className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-3">
+          <div className="mt-4 border-t border-slate-100 pt-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               Upcoming this month
             </p>

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { dashboardTileOutline, dashboardTileShadow } from "@/lib/dashboard-surface";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
 
 const WEEKDAY = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -60,10 +60,9 @@ export function DashboardWeekCalendar({
   return (
     <div
       className={cn(
-        "rounded-lg bg-white",
-        dashboardTileOutline,
-        dashboardTileShadow,
-        compact ? "p-3" : "p-4"
+        dashboardCardClass,
+        "gap-0 py-0",
+        compact ? "p-5" : "p-6"
       )}
     >
       <div className={cn("flex items-center justify-between", compact ? "mb-2" : "mb-3")}>

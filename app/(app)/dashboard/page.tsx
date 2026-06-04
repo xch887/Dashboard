@@ -15,7 +15,6 @@ export default function DashboardPage() {
     <ViewPage>
       <PageHeader
         icon={LayoutDashboard}
-        eyebrow="Live operations"
         title="Fleet readiness"
         description="Predictive signals, open actions, and compliance context in one view — prioritize what needs a human before the next shift."
       />

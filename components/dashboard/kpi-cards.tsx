@@ -1,12 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
@@ -21,7 +16,10 @@ import {
   Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { dashboardTileOutline, dashboardTileShadow } from "@/lib/dashboard-surface";
+import {
+  dashboardCardClass,
+  dashboardCardGridGap,
+} from "@/lib/dashboard-surface";
 
 type Urgency = "critical" | "caution" | "positive" | "neutral";
 
@@ -149,33 +147,22 @@ function Sparkline({
   );
 }
 
-const urgencyStyles: Record<
-  Urgency,
-  { bar: string; tint: string; ring: string; spark: string }
-> = {
+const urgencyStyles: Record<Urgency, { spark: string; iconBg: string }> = {
   critical: {
-    bar: "bg-rose-500",
-    tint: "bg-rose-50/90",
-    ring: "ring-rose-200/80",
     spark: "stroke-rose-500",
+    iconBg: "bg-rose-50 text-rose-600",
   },
   caution: {
-    bar: "bg-amber-500",
-    tint: "bg-amber-50/50",
-    ring: "ring-amber-200/70",
     spark: "stroke-amber-600",
+    iconBg: "bg-slate-100 text-blue-600",
   },
   positive: {
-    bar: "bg-emerald-500",
-    tint: "bg-emerald-50/40",
-    ring: "ring-emerald-200/70",
     spark: "stroke-emerald-600",
+    iconBg: "bg-slate-100 text-blue-600",
   },
   neutral: {
-    bar: "bg-slate-300",
-    tint: "bg-slate-50/80",
-    ring: "ring-slate-200/80",
     spark: "stroke-slate-500",
+    iconBg: "bg-slate-100 text-blue-600",
   },
 };
 
@@ -193,9 +180,8 @@ export function KpiCards({
     <div
       className={cn(
         "grid",
-        dash
-          ? "grid-cols-2 gap-2 sm:gap-2 lg:grid-cols-4 lg:gap-2.5"
-          : "grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-5"
+        dashboardCardGridGap,
+        dash ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
       )}
     >
       {metrics.map((metric) => {
@@ -225,169 +211,108 @@ export function KpiCards({
                   }
                 }}
                 className={cn(
-                  "group/kpi relative overflow-hidden rounded-2xl bg-white text-left transition-[box-shadow,border-color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-out)]",
-                  dashboardTileOutline,
-                  dash && "min-h-0 lg:min-h-[112px]",
+                  "group/kpi gap-0 overflow-hidden py-0 text-left transition-[box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-out)]",
+                  dashboardCardClass,
+                  dash && "min-h-0",
                   metric.filterParam
                     ? "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
                     : "",
-                  metric.focal
-                    ? dash
-                      ? "shadow-[0_12px_40px_-14px_rgb(37_99_235/0.2)]"
-                      : "border-blue-600/30 shadow-[0_22px_44px_-20px_rgb(37_99_235/0.28)] ring-1 ring-blue-600/18"
-                    : dash
-                      ? cn(
-                          dashboardTileShadow,
-                          "hover:border-black/30 hover:shadow-[0_12px_36px_-12px_rgb(15_23_42/0.12)]"
-                        )
-                      : "border-slate-200/80 shadow-[0_2px_8px_-2px_rgb(15_23_42/0.04)] ring-1 hover:border-slate-300/90 hover:shadow-[0_10px_24px_-14px_rgb(15_23_42/0.09)] hover:ring-slate-300/60",
-                  u.tint,
-                  !dash && !metric.focal && u.ring
+                  "hover:shadow-[0_16px_48px_-14px_rgb(99_102_241/0.14)]"
                 )}
               >
-            <span
-              className={cn(
-                "absolute bottom-0 left-0 top-0 w-[3px] rounded-l-2xl",
-                u.bar
-              )}
-              aria-hidden
-            />
-            <CardHeader
-              className={cn(
-                "flex flex-row items-start justify-between space-y-0",
-                dash
-                  ? "gap-1.5 pb-1 pl-2.5 pt-2.5"
-                  : cn(
-                      "gap-3 pb-2 pl-4 pt-5",
-                      metric.focal && "sm:pt-6"
-                    )
-              )}
-            >
-              <CardTitle
-                className={cn(
-                  "font-semibold uppercase leading-none tracking-[0.12em]",
-                  dash ? "text-[9px] tracking-[0.1em]" : "text-[10px] tracking-[0.12em]",
-                  metric.focal ? "text-blue-900/85" : "text-slate-400"
-                )}
-              >
-                {metric.title}
-              </CardTitle>
-              <div
-                className={cn(
-                  "flex shrink-0 items-center justify-center rounded-lg text-blue-700",
-                  dash &&
-                    (metric.focal
-                      ? "h-6 w-6 bg-blue-600/12"
-                      : "h-5 w-5 bg-blue-500/[0.08]"),
-                  !dash &&
-                    (metric.focal
-                      ? "h-9 w-9 bg-blue-600/12 sm:h-10 sm:w-10"
-                      : "h-7 w-7 bg-blue-500/[0.08] sm:h-8 sm:w-8")
-                )}
-              >
-                <metric.icon
+                <CardContent
                   className={cn(
-                    dash &&
-                      (metric.focal ? "h-3 w-3" : "h-2.5 w-2.5"),
-                    !dash &&
-                      (metric.focal ? "h-4 w-4 sm:h-5 sm:w-5" : "h-3.5 w-3.5")
-                  )}
-                  strokeWidth={2}
-                  aria-hidden
-                />
-              </div>
-            </CardHeader>
-            <CardContent
-              className={cn(
-                "pt-0",
-                dash
-                  ? "space-y-1 pb-2 pl-2.5"
-                  : cn(
-                      "space-y-3 pb-5 pl-4",
-                      metric.focal && "sm:pb-6"
-                    )
-              )}
-            >
-              <div className="flex flex-wrap items-end justify-between gap-2">
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span
-                    className={cn(
-                      "font-extrabold leading-none tracking-tight text-slate-950 tabular-nums",
-                      metric.focal
-                        ? dash
-                          ? "text-xl sm:text-2xl"
-                          : "text-[2.25rem] sm:text-[2.75rem] md:text-[3rem]"
-                        : dash
-                          ? "text-base sm:text-lg"
-                          : "text-[1.5rem] sm:text-[1.875rem] md:text-[2rem]"
-                    )}
-                  >
-                    {metric.value}
-                  </span>
-                  <span
-                    className={cn(
-                      "font-medium text-slate-400",
-                      metric.focal
-                        ? dash
-                          ? "text-[10px]"
-                          : "text-xs"
-                        : dash
-                          ? "text-[10px]"
-                          : "text-[11px]"
-                    )}
-                  >
-                    {metric.sub}
-                  </span>
-                </div>
-                <Sparkline
-                  values={metric.spark}
-                  accentClass={u.spark}
-                  compact={dash}
-                />
-              </div>
-              <div
-                className={cn(
-                  "flex flex-wrap items-center gap-2",
-                  dash ? "text-[9px]" : "text-[11px]"
-                )}
-              >
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-bold tabular-nums",
-                    trendLooksBad
-                      ? "bg-rose-100 text-rose-800"
-                      : "bg-emerald-100 text-emerald-800"
+                    "px-0",
+                    dash ? "space-y-3 p-5" : "space-y-4 p-6"
                   )}
                 >
-                  <TrendIcon
-                    className={dash ? "h-3 w-3" : "h-3.5 w-3.5"}
-                    aria-hidden
-                  />
-                  {metric.trendPct}
-                </span>
-                <span className="text-slate-400">{metric.trendLabel}</span>
-              </div>
-              <p
-                className={cn(
-                  "leading-snug text-slate-600",
-                  dash
-                    ? "line-clamp-2 text-[9px] leading-snug"
-                    : "text-[11px]"
-                )}
-              >
-                {metric.comparison}
-              </p>
-              {metric.filterParam ? (
-                <p
-                  className={cn(
-                    "font-semibold text-blue-700/85 opacity-90 transition-[opacity,color] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-out)] group-hover/kpi:text-blue-800 group-hover/kpi:opacity-100",
-                    dash ? "text-[9px]" : "text-[10px]"
-                  )}
-                >
-                  Click to filter action queue →
-                </p>
-              ) : null}
-            </CardContent>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                      <span
+                        className={cn(
+                          "font-bold leading-none tracking-tight text-slate-950 tabular-nums",
+                          dash ? "text-2xl sm:text-[1.75rem]" : "text-3xl sm:text-4xl"
+                        )}
+                      >
+                        {metric.value}
+                      </span>
+                      <span
+                        className={cn(
+                          "font-medium text-slate-400",
+                          dash ? "text-xs" : "text-sm"
+                        )}
+                      >
+                        {metric.sub}
+                      </span>
+                    </div>
+                    <div
+                      className={cn(
+                        "flex shrink-0 items-center justify-center rounded-lg",
+                        dash ? "h-8 w-8" : "h-9 w-9",
+                        u.iconBg
+                      )}
+                    >
+                      <metric.icon
+                        className={dash ? "h-4 w-4" : "h-[18px] w-[18px]"}
+                        strokeWidth={2}
+                        aria-hidden
+                      />
+                    </div>
+                  </div>
+
+                  <p
+                    className={cn(
+                      "font-semibold text-slate-900",
+                      dash ? "text-sm" : "text-base"
+                    )}
+                  >
+                    {metric.title}
+                  </p>
+
+                  <div className="flex items-end justify-between gap-3">
+                    <div
+                      className={cn(
+                        "flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5",
+                        dash ? "text-xs" : "text-sm"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-0.5 font-semibold tabular-nums",
+                          trendLooksBad ? "text-rose-600" : "text-emerald-600"
+                        )}
+                      >
+                        <TrendIcon
+                          className={dash ? "h-3.5 w-3.5" : "h-4 w-4"}
+                          aria-hidden
+                        />
+                        {metric.trendPct}
+                      </span>
+                      <span className="text-slate-500">{metric.trendLabel}</span>
+                    </div>
+                    <Sparkline
+                      values={metric.spark}
+                      accentClass={u.spark}
+                      compact={dash}
+                    />
+                  </div>
+
+                  {!dash ? (
+                    <p className="text-[11px] leading-snug text-slate-600">
+                      {metric.comparison}
+                    </p>
+                  ) : null}
+                  {metric.filterParam ? (
+                    <p
+                      className={cn(
+                        "font-semibold text-blue-700/85 opacity-0 transition-[opacity,color] duration-[var(--motion-duration-fast)] group-hover/kpi:opacity-100",
+                        dash ? "text-[10px]" : "text-[11px]"
+                      )}
+                    >
+                      Click to filter action queue →
+                    </p>
+                  ) : null}
+                </CardContent>
               </Card>
             </TooltipTrigger>
             <TooltipContent side="top">

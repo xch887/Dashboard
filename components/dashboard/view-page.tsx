@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
+import { dashboardCardStackGap } from "@/lib/dashboard-surface";
 
 /** Standard vertical rhythm for every app route (below header). */
-export const VIEW_PAGE_CLASS = "w-full min-w-0 space-y-6";
+export const VIEW_PAGE_CLASS = cn("w-full min-w-0", dashboardCardStackGap);
 
 export function ViewPage({
   children,

@@ -9,49 +9,37 @@ export const OPERATIONS_COPILOT_JSON_SCHEMA = {
     type: "object",
     additionalProperties: false,
     properties: {
-      headline: {
+      explanation: {
         type: "string",
         description:
-          "HEADLINE: One decisive line — what they should do now. Not a data summary (e.g. prioritize DEV-1004 CT offline before end of shift because it blocks the imaging slate).",
+          "Concise summary of what is happening operationally (2–4 sentences, enterprise tone).",
       },
-      situation: {
-        type: "string",
-        description:
-          "SITUATION: 2–3 sentences. Only context needed to understand the headline. No filler, no restating the user question.",
-      },
-      key_factors: {
+      likely_reasons: {
         type: "array",
-        description:
-          "KEY FACTORS: 2–3 short strings. Each must pair evidence with “so what” (metric + implication). Not a data dump.",
+        description: "Contributing factors or likely root causes as short bullets.",
         items: { type: "string" },
       },
       reasoning_label: {
         type: "string",
-        description:
-          "One line naming what you prioritized first using the framework: patient safety → revenue/throughput → compliance → cost.",
+        description: "One short line naming the main lens (e.g. Fleet offline + PM backlog).",
       },
       confidence: {
         type: "string",
         enum: ["high", "medium", "low"],
-        description:
-          "high = clear call; medium = recommendation with tradeoff; low = two real options to weigh (not clinical certainty).",
+        description: "Confidence in the analysis (not clinical certainty).",
       },
       suggested_actions: {
         type: "array",
-        description:
-          "2–4 decisions framed as actions: Escalate, Page, Reassign, Approve, Defer. Each description must imply who, what, and when.",
+        description: "Concrete next steps the product could execute.",
         items: {
           type: "object",
           additionalProperties: false,
           properties: {
             id: {
               type: "string",
-              description: "Stable id slug, e.g. act_page_biomed_ct",
+              description: "Stable id slug, e.g. act_open_pm_radiology",
             },
-            label: {
-              type: "string",
-              description: "Short imperative button label (e.g. Page ICU biomed)",
-            },
+            label: { type: "string", description: "Short button label" },
             workflow: {
               type: "string",
               enum: [
@@ -64,8 +52,7 @@ export const OPERATIONS_COPILOT_JSON_SCHEMA = {
             },
             description: {
               type: "string",
-              description:
-                "One line: what happens in-product; include timing if relevant (before shift change, by Monday, etc.).",
+              description: "One line — what this action will do in the product.",
             },
           },
           required: ["id", "label", "workflow", "description"],
@@ -73,15 +60,13 @@ export const OPERATIONS_COPILOT_JSON_SCHEMA = {
       },
       follow_up_questions: {
         type: "array",
-        description:
-          "2–3 sharp follow-ups that force a decision (e.g. escalate to vendor now vs give biomed 2 more hours). Not generic detail requests.",
+        description: "2–4 short questions the user might ask next.",
         items: { type: "string" },
       },
     },
     required: [
-      "headline",
-      "situation",
-      "key_factors",
+      "explanation",
+      "likely_reasons",
       "reasoning_label",
       "confidence",
       "suggested_actions",

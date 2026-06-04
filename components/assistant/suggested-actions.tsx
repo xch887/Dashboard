@@ -79,10 +79,12 @@ export function SuggestedActions({
                   <Button
                     type="button"
                     size="sm"
-                    variant={isPending ? "secondary" : "default"}
+                    variant={isPending ? "outline" : "default"}
                     className={cn(
-                      "h-8 shrink-0 font-semibold active:scale-[0.98]",
-                      !isPending && "bg-slate-900 hover:bg-slate-800"
+                      "h-8 shrink-0 px-3 text-xs font-semibold active:scale-[0.98]",
+                      isPending
+                        ? "border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50"
+                        : "border-transparent bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-sm hover:from-blue-500 hover:to-blue-500"
                     )}
                     disabled={disabled}
                     onClick={() => onSelect(a)}
@@ -111,7 +113,7 @@ export function SuggestedActions({
                     <Button
                       type="button"
                       size="sm"
-                      className="h-8 bg-blue-600 font-semibold hover:bg-blue-700"
+                      className="h-8 border-transparent bg-gradient-to-b from-blue-500 to-blue-600 px-3 text-xs font-semibold text-white shadow-sm hover:from-blue-500 hover:to-blue-500 active:scale-[0.98]"
                       onClick={() => onConfirm(pendingAction)}
                     >
                       Confirm

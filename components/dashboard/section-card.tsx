@@ -1,12 +1,13 @@
 import { cn } from "@/lib/utils";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
 
 /**
- * Shared surfaces — one border, one radius, minimal shadow.
- * Prefer these over ad-hoc rounded-2xl / ring / bg-white/85 combos.
+ * Shared dashboard surfaces — borderless cards with soft lift.
  */
 
-const panelBase =
-  "rounded-xl border border-slate-200 bg-white shadow-sm";
+export const sectionPanelClass = dashboardCardClass;
+
+const panelBase = sectionPanelClass;
 
 export function SectionCard({
   children,
@@ -19,7 +20,7 @@ export function SectionCard({
   as?: React.ElementType;
 } & React.HTMLAttributes<HTMLElement>) {
   return (
-    <Comp className={cn(panelBase, "p-4 sm:p-5", className)} {...props}>
+    <Comp className={cn(panelBase, "p-5 sm:p-6", className)} {...props}>
       {children}
     </Comp>
   );
@@ -29,7 +30,7 @@ type StatTone = "default" | "critical" | "warning";
 
 const statTones: Record<StatTone, string> = {
   default: "border-slate-200 bg-white",
-  critical: "border-rose-200 bg-rose-50/40",
+  critical: "border-red-200 bg-red-50/40",
   warning: "border-amber-200 bg-amber-50/35",
 };
 
@@ -38,6 +39,7 @@ export function StatCard({
   value,
   hint,
   tone = "default",
+  labelStyle = "uppercase",
   className,
   children,
   ...props
@@ -46,6 +48,7 @@ export function StatCard({
   value: string;
   hint?: string;
   tone?: StatTone;
+  labelStyle?: "uppercase" | "default";
   className?: string;
   children?: React.ReactNode;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">) {
@@ -53,8 +56,11 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "relative rounded-xl border p-4 shadow-sm transition-shadow duration-200",
-        "hover:shadow-md",
+        "relative p-5 transition-shadow duration-200 sm:p-6",
+        dashboardCardClass,
+        "hover:shadow-[0_16px_48px_-14px_rgb(99_102_241/0.14)]",
+        tone === "default" && "border-0",
+        tone !== "default" && "border",
         statTones[tone],
         className
       )}
@@ -64,17 +70,19 @@ export function StatCard({
         <span
           className={cn(
             "absolute bottom-3 left-0 top-3 w-1 rounded-full",
-            tone === "critical" ? "bg-rose-500" : "bg-amber-500"
+            tone === "critical" ? "bg-red-600" : "bg-amber-500"
           )}
           aria-hidden
         />
       )}
       <p
         className={cn(
-          "text-[10px] font-semibold uppercase tracking-wide",
-          tone === "critical" && "text-rose-900",
-          tone === "warning" && "text-amber-950",
-          tone === "default" && "text-slate-500"
+          labelStyle === "uppercase" &&
+            "text-[10px] font-semibold uppercase tracking-wide",
+          labelStyle === "default" && "text-xs font-medium text-slate-600",
+          labelStyle === "uppercase" && tone === "critical" && "text-red-900",
+          labelStyle === "uppercase" && tone === "warning" && "text-amber-950",
+          labelStyle === "uppercase" && tone === "default" && "text-slate-500"
         )}
       >
         {label}
@@ -102,8 +110,8 @@ export function TableCard({
   className?: string;
 }) {
   return (
-    <div className={cn("overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm", className)}>
-      <div className="flex flex-col gap-1 border-b border-slate-100 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4">
+    <div className={cn("overflow-hidden", dashboardCardClass, className)}>
+      <div className="flex flex-col gap-1 border-b border-slate-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4">
         <div>
           <h2 className="text-sm font-semibold tracking-tight text-slate-900">
             {title}
@@ -129,7 +137,8 @@ export function HighlightCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-blue-200/70 bg-gradient-to-b from-blue-50/50 to-white p-4 shadow-sm sm:p-5",
+        dashboardCardClass,
+        "border border-blue-200/70 bg-gradient-to-b from-blue-50/50 to-white p-5 sm:p-6",
         className
       )}
     >

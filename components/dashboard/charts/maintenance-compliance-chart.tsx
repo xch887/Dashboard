@@ -21,7 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { dashboardTileOutline, dashboardTileShadow } from "@/lib/dashboard-surface";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
 
 /** Sept → Aug (12 months). */
 const MONTHS = [
@@ -149,24 +149,19 @@ export function MaintenanceComplianceChart({
 
   return (
     <Card
-      className={cn(
-        "rounded-lg bg-white",
-        dashboardTileOutline,
-        dashboardTileShadow,
-        compact ? "" : "h-full"
-      )}
+      className={cn(dashboardCardClass, "gap-0 py-0", compact ? "" : "h-full")}
     >
       <CardHeader
         className={cn(
-          "flex flex-row flex-wrap items-start justify-between gap-3 border-b border-black/10",
-          compact ? "pb-2 pt-3" : "pb-3"
+          "flex flex-row flex-wrap items-center justify-between gap-3 border-0",
+          compact ? "px-5 pb-3 pt-5" : "px-6 pb-4 pt-6"
         )}
       >
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <CardTitle
             className={cn(
               "font-semibold text-slate-900",
-              compact ? "text-xs" : "text-sm"
+              compact ? "text-sm" : "text-base"
             )}
           >
             Maintenance compliance
@@ -174,10 +169,10 @@ export function MaintenanceComplianceChart({
           <p
             className={cn(
               "font-normal text-slate-500",
-              compact ? "text-[11px]" : "text-xs"
+              compact ? "text-xs" : "text-sm"
             )}
           >
-            Rolling completion vs. scheduled work
+            % of devices meeting scheduled maintenance
           </p>
         </div>
         <DropdownMenu>
@@ -204,7 +199,7 @@ export function MaintenanceComplianceChart({
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
-      <CardContent className={cn(compact ? "pb-3 pt-2" : "pt-4")}>
+      <CardContent className={cn(compact ? "px-5 pb-5 pt-0" : "px-6 pb-6 pt-0")}>
         <div
           className={cn(
             "flex flex-wrap items-center gap-4",

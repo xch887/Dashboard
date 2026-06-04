@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useId } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { MOTION_DURATION, MOTION_EASE, motionTransition } from "@/lib/motion";
@@ -86,16 +87,24 @@ export const ExperienceEntryGate = forwardRef<HTMLDivElement, ExperienceEntryGat
             ease: MOTION_EASE.out,
           }}
         >
+          <div className="mb-6 flex justify-center">
+            <Image
+              src="/brand/medisync-lockup.svg"
+              alt="Medisync"
+              width={73}
+              height={18}
+              unoptimized
+              priority
+              className="h-7 w-auto object-contain sm:h-8"
+            />
+          </div>
           <div
             className="mx-auto mb-6 h-1 w-14 rounded-full bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-sky-400 shadow-[0_0_20px_rgb(37_99_235/0.35)]"
             aria-hidden
           />
-          <p className="text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-            {entryGateCopy.eyebrow}
-          </p>
           <h1
             id={titleId}
-            className="mt-4 text-center text-[1.65rem] font-semibold leading-[1.15] tracking-tight text-slate-900 sm:text-4xl md:text-[2.35rem]"
+            className="text-center text-[1.65rem] font-semibold leading-[1.15] tracking-tight text-slate-900 sm:text-4xl md:text-[2.35rem]"
           >
             {entryGateCopy.headline}
           </h1>
@@ -107,15 +116,29 @@ export const ExperienceEntryGate = forwardRef<HTMLDivElement, ExperienceEntryGat
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4">
-            <Button
-              id={ENTRY_CTA_ID}
-              type="button"
-              size="lg"
-              className="h-11 min-w-[11.5rem] rounded-lg px-8 text-sm font-semibold shadow-md shadow-blue-600/20"
-              onClick={onRequestEnter}
+            <motion.div
+              whileHover={reduceMotion ? undefined : { scale: 1.02, y: -1 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+              transition={motionTransition(reduceMotion, "fast")}
             >
-              {entryGateCopy.cta}
-            </Button>
+              <Button
+                id={ENTRY_CTA_ID}
+                type="button"
+                size="lg"
+                className={cn(
+                  "h-11 min-w-[11.5rem] rounded-lg px-8 text-sm font-semibold",
+                  "bg-gradient-to-b from-blue-500 to-blue-600 text-white",
+                  "shadow-md shadow-blue-600/25",
+                  "transition-[box-shadow,filter] duration-200",
+                  "hover:from-blue-500 hover:to-blue-500 hover:shadow-lg hover:shadow-blue-600/30 hover:brightness-105",
+                  "active:brightness-95",
+                  "focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2"
+                )}
+                onClick={onRequestEnter}
+              >
+                {entryGateCopy.cta}
+              </Button>
+            </motion.div>
             <p className="text-center text-[11px] leading-snug text-slate-500">
               {entryGateCopy.descriptor}
             </p>

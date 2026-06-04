@@ -7,6 +7,7 @@ import { Header } from "@/components/dashboard/header";
 import { SidebarProvider } from "@/components/dashboard/sidebar-context";
 import { AssistantFab } from "@/components/dashboard/assistant-fab";
 import { cn } from "@/lib/utils";
+import { dashboardMainInset } from "@/lib/dashboard-surface";
 import { shellContentTransition } from "@/lib/motion";
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
@@ -15,16 +16,19 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="flex h-screen min-h-0 bg-transparent">
+    <div className="flex h-screen min-h-0 bg-background">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col bg-background">
         <Header />
         <main
           className={cn(
-            "flex min-h-0 flex-1 flex-col overflow-x-hidden",
+            "flex min-h-0 flex-1 flex-col overflow-x-hidden bg-background",
             isAssistant
-              ? "overflow-x-hidden overflow-y-auto bg-slate-50/90 p-0"
-              : "gap-6 overflow-y-auto px-5 py-6 md:px-6 lg:px-8"
+              ? "overflow-hidden p-0"
+              : cn(
+                  dashboardMainInset,
+                  "gap-3 overflow-y-auto [scrollbar-gutter:stable]"
+                )
           )}
         >
           <AnimatePresence mode="wait" initial={false}>

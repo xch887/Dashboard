@@ -26,25 +26,30 @@ export function EmptyState({
   onSelectSuggestion: (text: string) => void;
 }) {
   return (
-    <div className="w-full space-y-6 text-center sm:space-y-7">
-      <div className="grid gap-2 text-left sm:gap-2.5">
-        {ASSISTANT_PROMPT_OPTIONS.map(({ prompt }) => (
-          <button
-            key={prompt}
-            type="button"
-            onClick={() => onSelectSuggestion(prompt)}
-            className={cn(
-              "motion-interactive rounded-xl border border-slate-200/90 bg-white px-3 py-2.5 text-left text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-100 sm:px-4 sm:py-3",
-              "hover:border-blue-200/90 hover:bg-blue-50/50 hover:text-slate-900 hover:shadow-md hover:ring-blue-100/80",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
-            )}
-          >
-            {prompt}
-          </button>
-        ))}
+    <div className="w-full space-y-7 text-center sm:space-y-8">
+      <div className="text-left">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          Suggested prompts
+        </p>
+        <div className="mt-3 grid gap-2.5 sm:mt-4 sm:gap-3">
+          {ASSISTANT_PROMPT_OPTIONS.map(({ prompt }) => (
+            <button
+              key={prompt}
+              type="button"
+              onClick={() => onSelectSuggestion(prompt)}
+              className={cn(
+                "motion-interactive rounded-xl border border-slate-200/90 bg-white px-3 py-2.5 text-left text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-100 sm:px-4 sm:py-3",
+                "hover:border-blue-200/90 hover:bg-blue-50/50 hover:text-slate-900 hover:shadow-md hover:ring-blue-100/80",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+              )}
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="border-t border-slate-100 pt-6 sm:pt-7">
+      <div className="pt-7 sm:pt-8">
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
           Example workflows
         </p>

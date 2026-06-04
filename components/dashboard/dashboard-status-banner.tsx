@@ -18,7 +18,7 @@ export function DashboardStatusBanner({
       className={cn(
         "flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm",
         hasCritical
-          ? "border-rose-200/90 bg-rose-50/80 text-rose-950"
+          ? "border-red-200/90 bg-red-50/80 text-red-950"
           : "border-emerald-200/90 bg-emerald-50/70 text-emerald-950"
       )}
       role="status"
@@ -26,7 +26,7 @@ export function DashboardStatusBanner({
       <div className="flex min-w-0 items-center gap-2.5">
         {hasCritical ? (
           <AlertTriangle
-            className="h-5 w-5 shrink-0 text-rose-600"
+            className="h-5 w-5 shrink-0 text-red-600"
             strokeWidth={2}
             aria-hidden
           />
@@ -54,7 +54,7 @@ export function DashboardStatusBanner({
         <Link
           href="/alerts"
           onClick={onViewAlerts}
-          className="shrink-0 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-rose-700"
+          className="shrink-0 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-red-700"
         >
           Open alerts
         </Link>

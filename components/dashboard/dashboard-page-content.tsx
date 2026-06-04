@@ -12,6 +12,10 @@ import { MaintenanceStatusDonut } from "@/components/dashboard/charts/maintenanc
 import { DashboardWeekCalendar } from "@/components/dashboard/charts/dashboard-week-calendar";
 import { UpcomingMaintenanceDeadlines } from "@/components/dashboard/charts/upcoming-maintenance-deadlines";
 import { cn } from "@/lib/utils";
+import {
+  dashboardCardGridGap,
+  dashboardCardStackGap,
+} from "@/lib/dashboard-surface";
 
 /**
  * KPI row → middle band (narrow compliance chart + widget grid) → full-width Device Action Queue.
@@ -50,16 +54,19 @@ export function DashboardPageContent() {
         ) : null}
       </AnimatePresence>
 
-      <div className="space-y-4">
+      <div className={dashboardCardStackGap}>
         <KpiCards density="dashboard" onToast={showToast} />
 
-        <div className="grid gap-3 lg:grid-cols-12 lg:items-start">
+        <div className={cn("grid lg:grid-cols-12 lg:items-start", dashboardCardGridGap)}>
           <div className="min-w-0 lg:col-span-4 xl:col-span-3">
             <MaintenanceComplianceChart compact />
           </div>
 
           <div
-            className="grid min-w-0 gap-3 sm:grid-cols-2 lg:col-span-8 xl:col-span-9"
+            className={cn(
+              "grid min-w-0 sm:grid-cols-2 lg:col-span-8 xl:col-span-9",
+              dashboardCardGridGap
+            )}
             aria-label="Dashboard widgets"
           >
             <DeviceHealthOverview compact />

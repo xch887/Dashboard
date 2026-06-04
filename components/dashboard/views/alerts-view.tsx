@@ -10,33 +10,52 @@ import { MiniAreaChart } from "@/components/dashboard/mini-chart";
 import { AlertTriangle } from "lucide-react";
 import { InsightBadge } from "@/components/dashboard/insight-badge";
 import { SectionCard } from "@/components/dashboard/section-card";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
+import { cn } from "@/lib/utils";
+
+function OnCallCard() {
+  return (
+    <div
+      className={cn(
+        dashboardCardClass,
+        "w-full max-w-[15rem] p-2 sm:min-w-[13.5rem]"
+      )}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+            On-call
+          </p>
+          <p className="text-xs font-semibold leading-tight text-slate-900">
+            Clinical Engineering
+          </p>
+          <p className="text-[11px] leading-tight text-slate-500">
+            Alex Morgan · Primary
+          </p>
+        </div>
+        <Button
+          variant="default"
+          size="sm"
+          className="h-7 shrink-0 px-2.5 text-[11px] font-semibold"
+        >
+          Page team
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function AlertsView() {
   const c = sectionConfigs.alerts;
 
   return (
-    <ViewPage className="space-y-4">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
-        <div className="min-w-0 flex-1">
-          <PageHeader
-            icon={AlertTriangle}
-            title={c.title}
-            description={c.description}
-          />
-        </div>
-        <SectionCard className="w-full shrink-0 lg:sticky lg:top-4 lg:max-w-[min(100%,280px)]">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            On-call
-          </h3>
-          <p className="mt-2 text-sm font-medium text-slate-900">
-            Clinical Engineering
-          </p>
-          <p className="text-xs text-slate-500">Alex Morgan · Primary</p>
-          <Button variant="default" size="sm" className="mt-3 w-full">
-            Page team
-          </Button>
-        </SectionCard>
-      </div>
+    <ViewPage>
+      <PageHeader
+        icon={AlertTriangle}
+        title={c.title}
+        description={c.description}
+        actions={<OnCallCard />}
+      />
 
       <SectionCard as="section" className="p-2.5 sm:p-3">
         <div className="flex flex-col gap-2.5 xl:flex-row xl:items-stretch xl:gap-3">
@@ -92,7 +111,7 @@ export function AlertsView() {
             {c.stats.map((s) => (
               <div
                 key={s.label}
-                className="rounded-md border border-slate-200/80 bg-white px-2 py-1 shadow-sm ring-1 ring-slate-200/50"
+                className={cn(dashboardCardClass, "px-2.5 py-2")}
               >
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                   {s.label}

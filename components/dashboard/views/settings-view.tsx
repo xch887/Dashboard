@@ -402,7 +402,7 @@ export function SettingsView() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-2.5 gap-y-3 lg:grid-cols-4">
         {c.stats.map((s) => (
           <div
             key={s.label}
@@ -421,7 +421,7 @@ export function SettingsView() {
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
+      <div className="grid gap-x-2.5 gap-y-3 lg:grid-cols-[1fr_280px]">
         <section className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-600/[0.07] to-white p-5 shadow-sm ring-1 ring-slate-200/50">
           <div className="flex items-center gap-2">
             <Palette className="h-4 w-4 text-blue-700" aria-hidden />

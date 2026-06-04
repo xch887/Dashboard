@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { CompactAssistantLoading } from "@/components/assistant/loading-state";
+import { OperationsIntelligenceEmblem } from "@/components/dashboard/operations-intelligence-icon";
 import type {
   ApiAssistantResponse,
   AssistantStructuredResponse,
@@ -15,8 +16,9 @@ import {
   intelligenceThreadToApiMessages,
 } from "@/lib/assistant/to-api-messages";
 import { motionTransition } from "@/lib/motion";
-import { ArrowUp, Sparkles, X } from "lucide-react";
+import { ArrowUp, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { dashboardMainInsetRight } from "@/lib/dashboard-surface";
 
 type FabMessage =
   | { id: string; role: "user"; text: string }
@@ -154,7 +156,8 @@ export function AssistantFab() {
             transition={motionTransition(reduceMotion, "base")}
             className={cn(
               "fixed z-[61] flex w-[min(calc(100vw-3rem),22rem)] max-h-[min(70vh,26rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_50px_-12px_rgb(15_23_42/0.25)]",
-              "bottom-[5.75rem] right-6 sm:right-6"
+              "bottom-[5.75rem]",
+              dashboardMainInsetRight
             )}
           >
             <div className="flex shrink-0 items-start justify-between gap-2 border-b border-slate-100 bg-white px-3 py-3">
@@ -163,13 +166,8 @@ export function AssistantFab() {
                   id="fab-intelligence-title"
                   className="flex items-center gap-2 text-sm font-semibold text-slate-900"
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white">
-                    <Sparkles
-                      className="h-3.5 w-3.5"
-                      fill="currentColor"
-                      strokeWidth={1.5}
-                      aria-hidden
-                    />
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center">
+                    <OperationsIntelligenceEmblem className="h-7 w-7" />
                   </span>
                   Intelligence
                 </h2>
@@ -318,24 +316,20 @@ export function AssistantFab() {
         aria-expanded={open}
         aria-haspopup="dialog"
         className={cn(
-          "fixed bottom-6 right-6 z-[60] flex size-14 items-center justify-center rounded-full",
-          "border border-white/25 bg-gradient-to-br from-sky-400 via-blue-600 to-indigo-700",
-          "text-white shadow-[0_10px_40px_-10px_rgb(37_99_235/0.65),0_4px_14px_-4px_rgb(79_70_229/0.45)]",
+          "fixed bottom-6 z-[60] flex size-14 items-center justify-center rounded-full",
+          dashboardMainInsetRight,
+          "border border-slate-200/90 bg-white",
+          "shadow-[0_10px_40px_-10px_rgb(37_99_235/0.45),0_4px_14px_-4px_rgb(15_23_42/0.12)]",
           "transition-[filter,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-out)]",
-          "hover:border-white/35 hover:shadow-[0_14px_48px_-10px_rgb(37_99_235/0.75),0_6px_20px_-4px_rgb(99_102_241/0.5)]",
-          "hover:brightness-[1.07] active:brightness-95",
+          "hover:border-blue-200/80 hover:shadow-[0_14px_48px_-10px_rgb(37_99_235/0.5),0_6px_20px_-4px_rgb(15_23_42/0.14)]",
+          "hover:brightness-[1.02] active:brightness-95",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-100",
           open && "ring-2 ring-blue-400/50 ring-offset-2 ring-offset-slate-100"
         )}
         aria-label={open ? "Close Intelligence" : "Open Intelligence"}
         title={open ? "Close Intelligence" : "Open Intelligence"}
       >
-        <Sparkles
-          className="relative h-[1.35rem] w-[1.35rem] shrink-0 drop-shadow-[0_1px_2px_rgb(0_0_0/0.2)]"
-          strokeWidth={2}
-          fill="currentColor"
-          aria-hidden
-        />
+        <OperationsIntelligenceEmblem className="h-8 w-8 drop-shadow-sm" />
       </motion.button>
     </>
   );

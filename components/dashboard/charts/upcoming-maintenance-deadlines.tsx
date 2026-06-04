@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { dashboardTileOutline, dashboardTileShadow } from "@/lib/dashboard-surface";
+import { dashboardCardClass } from "@/lib/dashboard-surface";
 import { CalendarClock } from "lucide-react";
 
 type Deadline = {
@@ -78,15 +78,14 @@ export function UpcomingMaintenanceDeadlines({
   return (
     <Card
       className={cn(
-        "rounded-lg bg-white",
-        dashboardTileOutline,
-        dashboardTileShadow
+        dashboardCardClass,
+        "gap-0 py-0"
       )}
     >
       <CardHeader
         className={cn(
-          "border-b border-black/10",
-          compact ? "pb-2 pt-3" : "pb-3"
+          "border-b border-slate-100",
+          compact ? "px-5 pb-3 pt-5" : "px-6 pb-4 pt-6"
         )}
       >
         <div className="flex items-start justify-between gap-3">

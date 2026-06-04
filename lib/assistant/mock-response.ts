@@ -5,45 +5,39 @@ export function buildMockAssistantResponse(
 ): AssistantStructuredResponse {
   const q = userMessage.trim();
   const preview =
-    q.length > 80 ? `${q.slice(0, 80).trim()}…` : q || "your question";
+    q.length > 100 ? `${q.slice(0, 100).trim()}…` : q || "your message";
 
   return {
-    headline:
-      "Add OPENAI_API_KEY to .env.local and restart the dev server — then you get live decision-style answers instead of this fixed preview.",
-    situation: `Demo mode is on, so the server never called the model. You asked about “${preview}”. The layout below matches what production returns: headline first, then context, factors, and actions.`,
-    key_factors: [
-      "No API key → every reply uses this same structured placeholder (so what: you can still test buttons and navigation).",
-      "With a key, the copilot uses Regency Medical demo facts and the decision-driving rules in the system prompt.",
+    explanation: `This is demo mode (no OPENAI_API_KEY on the server). You asked about: "${preview}". With a key set, answers use the same layout but come from the live model and the demo facts in the system prompt.`,
+    likely_reasons: [
+      "Demo responses are fixed so you can test the UI without calling OpenAI.",
+      "Numbers and device IDs in answers should match the Regency Medical demo data.",
     ],
-    reasoning_label:
-      "Throughput of your evaluation first — unblock real answers before tuning copy.",
+    reasoning_label: "Demo / offline",
     confidence: "low",
     suggested_actions: [
       {
-        id: "demo_open_fleet",
+        id: "demo_fleet",
         label: "Open Fleet",
         workflow: "apply_filters",
-        description:
-          "Jump to the device list now to cross-check IDs while you wire the API key.",
+        description: "Review device list and connectivity for the site.",
       },
       {
-        id: "demo_open_analytics",
+        id: "demo_analytics",
         label: "Open Analytics",
         workflow: "open_analytics",
-        description:
-          "Review trends in the demo dataset before your next leadership readout this week.",
+        description: "See trends for uptime, PMs, and backlog.",
       },
       {
-        id: "demo_summary",
-        label: "Queue executive summary",
+        id: "demo_report",
+        label: "Generate summary",
         workflow: "generate_report",
-        description:
-          "Placeholder report action — connect CMMS export when you go beyond demo.",
+        description: "Queue an executive-style report (placeholder in this build).",
       },
     ],
     follow_up_questions: [
-      "Do you want answers scoped to one department or the whole hospital this week?",
-      "After the key works, should we tune tone for your COO or for bedside ops leads?",
+      "Do you care most about patient-facing devices or the whole fleet?",
+      "Should we focus on this week or the full month?",
     ],
   };
 }
