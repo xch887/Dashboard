@@ -7,8 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { dashboardCardClass } from "@/lib/dashboard-surface";
+import {
+  dashboardCardClass,
+  dashboardChartColors,
+} from "@/lib/dashboard-surface";
 
 const CX = 100;
 const CY = 100;
@@ -24,10 +28,34 @@ type Slice = {
 };
 
 const SLICES: Slice[] = [
-  { key: "healthy", label: "Healthy", pct: 82, count: 6940, color: "#059669" },
-  { key: "warning", label: "Warning", pct: 11, count: 932, color: "#eab308" },
-  { key: "critical", label: "Critical", pct: 4, count: 339, color: "#ef4444" },
-  { key: "offline", label: "Offline", pct: 3, count: 252, color: "#94a3b8" },
+  {
+    key: "healthy",
+    label: "Healthy",
+    pct: 82,
+    count: 6940,
+    color: dashboardChartColors.healthy,
+  },
+  {
+    key: "warning",
+    label: "Warning",
+    pct: 11,
+    count: 931,
+    color: dashboardChartColors.warning,
+  },
+  {
+    key: "critical",
+    label: "Critical",
+    pct: 4,
+    count: 339,
+    color: dashboardChartColors.critical,
+  },
+  {
+    key: "offline",
+    label: "Offline",
+    pct: 3,
+    count: 253,
+    color: dashboardChartColors.offline,
+  },
 ];
 
 const TOTAL = SLICES.reduce((a, s) => a + s.count, 0);
@@ -65,12 +93,21 @@ function donutSegment(
 
 export function DeviceHealthOverview({
   compact = false,
+  topRow = false,
+  mini = false,
+  className,
 }: {
   compact?: boolean;
+  /** Dashboard top band: horizontal donut + legend, tighter header. */
+  topRow?: boolean;
+  /** Smaller tile beside KPI grid (left of calendar). */
+  mini?: boolean;
+  className?: string;
 }) {
   const [hovered, setHovered] = useState<string | null>(null);
-  const R_OUT_S = compact ? 56 : R_OUT;
-  const R_IN_S = compact ? 38 : R_IN;
+  const band = mini || topRow;
+  const R_OUT_S = mini ? 42 : topRow ? 50 : compact ? 56 : R_OUT;
+  const R_IN_S = mini ? 28 : topRow ? 34 : compact ? 38 : R_IN;
 
   const segments = useMemo(() => {
     return SLICES.map((s, i) => {
@@ -85,56 +122,94 @@ export function DeviceHealthOverview({
   }, [R_OUT_S, R_IN_S]);
 
   const active = segments.find((s) => s.key === hovered);
-  const svgClass = compact ? "h-[168px] w-[168px]" : "h-[220px] w-[220px]";
+  const svgClass = mini
+    ? "h-[112px] w-[112px]"
+    : topRow
+      ? "h-[140px] w-[140px]"
+      : compact
+        ? "h-[168px] w-[168px]"
+        : "h-[220px] w-[220px]";
 
   return (
     <Card
       className={cn(
-        "h-full",
+        band ? "h-auto" : "h-full",
         dashboardCardClass,
         "gap-0 py-0",
-        compact && "flex flex-col"
+        band && "flex flex-col",
+        className
       )}
     >
       <CardHeader
         className={cn(
           "border-b border-slate-100",
-          compact ? "px-5 py-4" : "px-6 pb-4 pt-6"
+          mini
+            ? "flex flex-row items-center justify-between gap-2 space-y-0 px-3 py-2"
+            : topRow
+              ? "px-4 py-3"
+              : compact
+                ? "px-5 py-4"
+                : "px-6 pb-4 pt-6"
         )}
       >
         <CardTitle
           className={cn(
             "font-semibold text-slate-900",
-            compact ? "text-sm" : "text-base"
+            mini
+              ? "text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-700"
+              : compact
+                ? "text-sm"
+                : "text-base"
           )}
         >
-          Device health overview
+          Device Health Overview
         </CardTitle>
-        <p
-          className={cn(
-            "text-slate-500",
-            compact ? "text-[11px] leading-snug" : "text-xs"
-          )}
-        >
-          Fleet status by operational state — last sync within 15 min
-        </p>
+        {mini ? (
+          <button
+            type="button"
+            className="ml-auto rounded-md p-0.5 text-slate-400 hover:bg-slate-50 hover:text-slate-600"
+            aria-label="Device health settings"
+          >
+            <Settings className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        ) : null}
+        {!mini ? (
+          <p
+            className={cn(
+              "text-slate-500",
+              compact || topRow
+                ? "text-[11px] leading-snug"
+                : "text-xs"
+            )}
+          >
+            Fleet status by operational state — last sync within 15 min
+          </p>
+        ) : null}
       </CardHeader>
       <CardContent
         className={cn(
           "pt-5",
-          compact && "flex flex-1 flex-col pt-3 pb-2"
+          band && "flex flex-col px-3 pt-2 pb-2",
+          !band && "pt-5"
         )}
       >
         <div
           className={cn(
             "flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-8",
-            compact && "gap-3 sm:flex-col sm:items-stretch"
+            band && "flex-row items-center gap-2",
+            compact && !band && "gap-3 sm:flex-col sm:items-stretch"
           )}
         >
           <div
             className={cn(
-              "relative mx-auto shrink-0",
-              compact ? "w-[168px]" : "w-[220px] sm:mx-0"
+              "relative shrink-0",
+              mini
+                ? "mx-0 w-[112px]"
+                : topRow
+                  ? "mx-0 w-[140px]"
+                  : compact
+                    ? "mx-auto w-[168px]"
+                    : "mx-auto w-[220px] sm:mx-0"
             )}
           >
             <svg
@@ -174,34 +249,41 @@ export function DeviceHealthOverview({
               <p
                 className={cn(
                   "font-bold tabular-nums tracking-tight text-slate-900",
-                  compact ? "text-xl" : "text-2xl"
+                  mini ? "text-base" : topRow ? "text-lg" : compact ? "text-xl" : "text-2xl"
                 )}
               >
                 {TOTAL.toLocaleString()}
               </p>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+              <p
+                className={cn(
+                  "font-medium uppercase tracking-wide text-slate-500",
+                  mini ? "text-[9px]" : "text-[11px]"
+                )}
+              >
                 Devices
               </p>
             </div>
           </div>
 
-          <div className="w-full min-w-0 flex-1 space-y-1">
-            <p
-              className={cn(
-                "text-[10px] font-semibold uppercase tracking-wide text-slate-400",
-                compact ? "mb-1" : "mb-2"
-              )}
-            >
-              Legend
-            </p>
-            <ul className={cn(compact ? "space-y-1" : "space-y-2")}>
+          <div className="w-full min-w-0 flex-1 space-y-0.5">
+            {!band ? (
+              <p
+                className={cn(
+                  "text-[10px] font-semibold uppercase tracking-wide text-slate-400",
+                  compact ? "mb-1" : "mb-2"
+                )}
+              >
+                Legend
+              </p>
+            ) : null}
+            <ul className={cn(band ? "space-y-0" : compact ? "space-y-0.5" : "space-y-2")}>
               {segments.map((seg) => (
                 <li key={seg.key}>
                   <button
                     type="button"
                     className={cn(
-                      "flex w-full items-center justify-between gap-2 rounded-lg text-left transition-colors duration-150",
-                      compact ? "px-1.5 py-1" : "px-2 py-1.5",
+                      "flex w-full items-center justify-between gap-1 rounded-md text-left transition-colors duration-150",
+                      mini ? "px-0 py-0.5" : band ? "px-1 py-0.5" : compact ? "px-1.5 py-1" : "px-2 py-1.5",
                       hovered === seg.key ? "bg-slate-100" : "hover:bg-slate-50"
                     )}
                     onMouseEnter={() => setHovered(seg.key)}
@@ -209,14 +291,17 @@ export function DeviceHealthOverview({
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <span
-                        className="h-2.5 w-2.5 shrink-0 rounded-sm ring-1 ring-slate-900/[0.05]"
+                        className={cn(
+                          "shrink-0 rounded-sm ring-1 ring-slate-900/[0.05]",
+                          mini ? "h-2 w-2" : "h-2.5 w-2.5"
+                        )}
                         style={{ backgroundColor: seg.color }}
                         aria-hidden
                       />
                       <span
                         className={cn(
                           "truncate font-medium text-slate-800",
-                          compact ? "text-xs" : "text-sm"
+                          mini ? "text-[10px]" : band ? "text-[11px]" : compact ? "text-xs" : "text-sm"
                         )}
                       >
                         {seg.label}
@@ -224,22 +309,34 @@ export function DeviceHealthOverview({
                     </span>
                     <span
                       className={cn(
-                        "shrink-0 text-right font-semibold tabular-nums text-slate-900",
-                        compact ? "text-xs" : "text-sm"
+                        "shrink-0 tabular-nums text-slate-900",
+                        mini ? "text-[10px] font-semibold" : "text-right font-semibold",
+                        !mini && (compact ? "text-xs" : "text-sm")
                       )}
                     >
-                      <span className="block">
-                        {seg.count.toLocaleString()}
-                      </span>
-                      <span className="text-xs font-normal text-slate-500">
-                        ({seg.pct}%)
-                      </span>
+                      {mini ? (
+                        <span>
+                          {seg.pct}%{" "}
+                          <span className="font-normal text-slate-400">
+                            ({seg.count.toLocaleString()})
+                          </span>
+                        </span>
+                      ) : (
+                        <>
+                          <span className="block">
+                            {seg.count.toLocaleString()}
+                          </span>
+                          <span className="text-xs font-normal text-slate-500">
+                            ({seg.pct}%)
+                          </span>
+                        </>
+                      )}
                     </span>
                   </button>
                 </li>
               ))}
             </ul>
-            {active && !compact ? (
+            {active && !compact && !mini ? (
               <p className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
                 <span className="font-semibold text-slate-800">
                   {active.label}:

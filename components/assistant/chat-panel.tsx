@@ -1,15 +1,21 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { AIResponseCard } from "@/components/assistant/ai-response-card";
 import {
-  ASSISTANT_PROMPT_OPTIONS,
-  EmptyState,
-} from "@/components/assistant/empty-state";
+  ChatHistoryPanel,
+  type PastChat,
+} from "@/components/assistant/chat-history-panel";
+import { ComposerDock } from "@/components/assistant/composer-dock";
+import { EmptyState } from "@/components/assistant/empty-state";
 import { LoadingState } from "@/components/assistant/loading-state";
 import type {
   ApiAssistantResponse,
@@ -18,12 +24,13 @@ import type {
 } from "@/lib/assistant/types";
 import { intelligenceThreadToApiMessages } from "@/lib/assistant/to-api-messages";
 import { sectionPanelClass } from "@/components/dashboard/section-card";
+import { useBrowserClock } from "@/lib/browser-clock";
 import { SHOW_DASHBOARD_IN_NAV } from "@/lib/nav-config";
 import { motionTransition } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { ArrowUp, Search } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 
-/** Sync + spark mark above Operations intelligence hero. */
+/** Ops-intelligence mark used in the briefing header. */
 const ASSISTANT_HERO_ICON = "/brand/operations-intelligence-icon.svg";
 
 type ChatMessage =
@@ -34,9 +41,6 @@ type ChatMessage =
       structured: AssistantStructuredResponse;
       demo?: boolean;
     };
-
-const composerShellClass =
-  "flex w-full items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1.5 pl-3 shadow-sm focus-within:ring-2 focus-within:ring-blue-500/35 focus-within:ring-offset-2";
 
 export function ChatPanel() {
   const router = useRouter();
@@ -53,6 +57,12 @@ export function ChatPanel() {
     null
   );
   const [outcome, setOutcome] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const liveClock = useBrowserClock();
+
+  const openHistory = useCallback(() => {
+    setHistoryOpen(true);
+  }, []);
 
   const scrollToEnd = useCallback(() => {
     requestAnimationFrame(() => {
@@ -168,6 +178,38 @@ export function ChatPanel() {
     [router]
   );
 
+  const goHome = useCallback(() => {
+    setMessages([]);
+    setInput("");
+    setError(null);
+    setOutcome(null);
+    setPendingAction(null);
+    setPendingForMessageId(null);
+    setHistoryOpen(false);
+  }, []);
+
+  const openPastChat = useCallback((chat: PastChat) => {
+    setError(null);
+    setOutcome(null);
+    setPendingAction(null);
+    setPendingForMessageId(null);
+    setInput("");
+    setMessages([
+      { id: `${chat.id}-user`, role: "user", text: chat.userText },
+      {
+        id: `${chat.id}-assistant`,
+        role: "assistant",
+        structured: chat.structured,
+        demo: true,
+      },
+    ]);
+    setHistoryOpen(false);
+  }, []);
+
+  const threadTitle =
+    messages.find((m): m is Extract<ChatMessage, { role: "user" }> => m.role === "user")
+      ?.text ?? "Conversation";
+
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       <AnimatePresence>
@@ -187,7 +229,28 @@ export function ChatPanel() {
       </AnimatePresence>
 
       <AnimatePresence mode="wait" initial={false}>
-        {messages.length === 0 ? (
+        {historyOpen ? (
+          <motion.div
+            key="history"
+            className="flex h-full min-h-0 w-full min-w-0 flex-1 flex-col"
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: reduceMotion ? 0 : -6 }}
+            transition={motionTransition(reduceMotion, "base")}
+          >
+            <div
+              className={cn(
+                sectionPanelClass,
+                "relative flex min-h-0 flex-1 flex-col overflow-hidden"
+              )}
+            >
+              <ChatHistoryPanel
+                onBack={() => setHistoryOpen(false)}
+                onOpenChat={openPastChat}
+              />
+            </div>
+          </motion.div>
+        ) : messages.length === 0 ? (
           <motion.div
             key="empty"
             className="flex h-full min-h-0 w-full min-w-0 flex-1 flex-col"
@@ -203,88 +266,48 @@ export function ChatPanel() {
                 "relative flex min-h-0 flex-1 flex-col overflow-hidden"
               )}
             >
-                <div className="flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto px-5 pb-8 pt-8 sm:gap-8 sm:px-6 sm:pb-9 sm:pt-9 lg:px-8 lg:pb-10 lg:pt-10">
-                  <div className="text-center">
-                    <div className="mx-auto mb-3 flex justify-center sm:mb-4">
-                      <Image
-                        src={ASSISTANT_HERO_ICON}
-                        alt=""
-                        width={18}
-                        height={18}
-                        unoptimized
-                        priority
-                        aria-hidden
-                        className="h-12 w-12 object-contain sm:h-14 sm:w-14"
-                      />
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-[1.65rem]">
-                      Operations intelligence
-                    </h1>
-                    <p className="mx-auto mt-2 max-w-3xl text-sm leading-relaxed text-slate-500">
-                      Structured answers for fleet, maintenance, and
-                      incidents — with executable next steps.
-                    </p>
-                  </div>
-
-                  <div className="w-full min-w-0">
-                    <div className={composerShellClass}>
-                      <Search
-                        className="h-4 w-4 shrink-0 text-slate-400"
-                        aria-hidden
-                      />
-                      <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            void sendText(input);
-                          }
-                        }}
-                        placeholder="Describe the operational question…"
-                        className="min-w-0 flex-1 bg-transparent py-2 text-[15px] leading-snug text-slate-900 placeholder:text-slate-400 focus:outline-none md:text-base"
-                      />
-                      <Button
-                        type="button"
-                        size="icon"
-                        onClick={() => void sendText(input)}
-                        disabled={!input.trim() || loading}
-                        className="h-10 w-10 shrink-0 rounded-full bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:scale-[0.97] disabled:opacity-40 sm:h-11 sm:w-11"
-                        aria-label="Send"
-                      >
-                        <ArrowUp className="h-4 w-4" strokeWidth={2.25} />
-                      </Button>
-                    </div>
-
-                    <div
-                      className="mt-4 flex flex-wrap justify-center gap-2 sm:mt-5"
-                      role="group"
-                      aria-label="Quick suggestions"
-                    >
-                      {ASSISTANT_PROMPT_OPTIONS.map(({ chip, prompt }) => (
-                        <button
-                          key={prompt}
-                          type="button"
-                          onClick={() => void sendText(prompt)}
-                          className={cn(
-                            "motion-interactive rounded-full border border-slate-200/90 bg-slate-50/90 px-3.5 py-2 text-[11px] font-medium text-slate-600 shadow-sm ring-1 ring-slate-100/80 sm:text-xs",
-                            "hover:border-blue-200/90 hover:bg-blue-50/70 hover:text-slate-800 hover:ring-blue-100/60",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
-                          )}
-                        >
-                          {chip}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-auto w-full pt-2 sm:pt-4">
-                    <EmptyState
-                      onSelectSuggestion={(s) => void sendText(s)}
+                <header className="flex shrink-0 items-center justify-between gap-3 px-5 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5 lg:px-7">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <Image
+                      src={ASSISTANT_HERO_ICON}
+                      alt=""
+                      width={20}
+                      height={20}
+                      unoptimized
+                      priority
+                      aria-hidden
+                      className="h-5 w-5 object-contain"
                     />
+                    <h1 className="truncate text-base font-semibold leading-6 tracking-tight text-slate-900 sm:text-lg sm:leading-7">
+                      Operations Intelligence
+                    </h1>
                   </div>
+                  <p className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-slate-500">
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-teal-500"
+                      aria-hidden
+                    />
+                    <span className="tabular-nums">
+                      {liveClock
+                        ? `Systems live · ${liveClock}`
+                        : "Systems live"}
+                    </span>
+                  </p>
+                </header>
+
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 sm:px-6 lg:px-7">
+                  <EmptyState onSelectSuggestion={(s) => void sendText(s)} />
                 </div>
+
+                <ComposerDock
+                  value={input}
+                  onChange={setInput}
+                  onSend={(text) => void sendText(text ?? input)}
+                  disabled={loading}
+                  placeholder="Ask about a device, a unit, or who’s on the hook…"
+                  expandable
+                  onOpenHistory={openHistory}
+                />
             </div>
           </div>
           </motion.div>
@@ -297,26 +320,6 @@ export function ChatPanel() {
           exit={{ opacity: 0, y: reduceMotion ? 0 : -4 }}
           transition={motionTransition(reduceMotion, "base")}
         >
-          <div className="mb-3 flex items-center gap-2 border-b border-slate-100 pb-3 md:hidden">
-            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-              <Image
-                src={ASSISTANT_HERO_ICON}
-                alt=""
-                width={18}
-                height={18}
-                unoptimized
-                aria-hidden
-                className="h-9 w-9 object-contain"
-              />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                Operations intelligence
-              </p>
-              <p className="text-[11px] text-slate-500">Structured thread</p>
-            </div>
-          </div>
-
           <div className="relative min-h-0 flex-1">
             <div
               className={cn(
@@ -324,6 +327,20 @@ export function ChatPanel() {
                 "relative z-10 flex h-full min-h-0 flex-col overflow-hidden"
               )}
             >
+              <header className="flex shrink-0 items-center gap-1 border-b border-slate-100 px-3 py-2.5 sm:px-4">
+                <HeaderIcon label="Back to home" onClick={goHome}>
+                  <ArrowLeft strokeWidth={1.75} />
+                </HeaderIcon>
+                <div className="min-w-0 flex-1 px-1">
+                  <p className="truncate text-sm font-semibold text-slate-900">
+                    {threadTitle}
+                  </p>
+                  <p className="text-[11px] text-slate-500">Conversation</p>
+                </div>
+                <HeaderIcon label="New chat" onClick={goHome}>
+                  <Plus strokeWidth={1.75} />
+                </HeaderIcon>
+              </header>
               <div
                 ref={listRef}
                 className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 md:p-6"
@@ -370,6 +387,7 @@ export function ChatPanel() {
                     >
                       <div className="w-full max-w-[min(100%,44rem)]">
                         <AIResponseCard
+                          responseId={m.id}
                           data={m.structured}
                           demo={m.demo}
                           pendingAction={showPending}
@@ -399,43 +417,42 @@ export function ChatPanel() {
                 </AnimatePresence>
               </div>
 
-              <div className="shrink-0 border-t border-slate-100 bg-slate-50/50 px-4 py-4 md:px-6">
-                <div className={composerShellClass}>
-                  <Search className="h-4 w-4 shrink-0 text-slate-400" />
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        void sendText(input);
-                      }
-                    }}
-                    placeholder="Ask a follow-up…"
-                    disabled={loading}
-                    className="min-w-0 flex-1 bg-transparent py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:opacity-50"
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    onClick={() => void sendText(input)}
-                    disabled={!input.trim() || loading}
-                    className="h-10 w-10 shrink-0 rounded-full bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.97] disabled:opacity-40"
-                    aria-label="Send"
-                  >
-                    <ArrowUp className="h-4 w-4" strokeWidth={2.25} />
-                  </Button>
-                </div>
-                <p className="mt-2 text-center text-[10px] text-slate-400">
-                  Responses are generated server-side. Do not paste PHI.
-                </p>
-              </div>
+              <ComposerDock
+                value={input}
+                onChange={setInput}
+                onSend={(text) => void sendText(text ?? input)}
+                disabled={loading}
+                placeholder="Ask a follow-up…"
+                showPhiNote
+                onOpenHistory={openHistory}
+              />
             </div>
           </div>
         </motion.div>
       )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function HeaderIcon({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+    >
+      <span className="[&_svg]:h-4 [&_svg]:w-4">{children}</span>
+    </button>
   );
 }

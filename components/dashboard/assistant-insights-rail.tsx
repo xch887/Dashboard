@@ -7,19 +7,21 @@ import {
   type InsightActionContext,
   type InsightActionId,
 } from "@/components/dashboard/insight-action-dialog";
+import { AIResponseFeedback } from "@/components/assistant/ai-response-feedback";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import {
+  Activity,
   Calendar,
   ClipboardList,
   Clock,
   Download,
   FileText,
+  Gauge,
   Info,
-  LineChart,
   ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -30,6 +32,8 @@ type InsightSignal = {
   tone?: "neutral" | "warning" | "critical";
 };
 
+type InsightRank = "lead" | "next" | "watch";
+
 type Insight = {
   id: InsightActionId;
   title: string;
@@ -38,7 +42,7 @@ type Insight = {
   confidence: number;
   level: "High" | "Med";
   icon: typeof Clock;
-  theme: "emerald" | "blue";
+  rank: InsightRank;
   signals: InsightSignal[];
   /** Seven-day trend points (0–100) shown in the hover detail. */
   sparkline: number[];
@@ -55,8 +59,6 @@ const signalToneClass = {
 const insightTooltipClassName =
   "max-w-[min(100vw-2rem,24rem)] space-y-2.5 border-blue-200/90 bg-gradient-to-br from-sky-50 via-blue-50 to-blue-100/90 p-3 text-slate-800 shadow-lg shadow-blue-900/10";
 
-const insightTooltipArrowClassName = "fill-sky-50 bg-sky-50";
-
 const insights: Insight[] = [
   {
     id: "reallocate_staff",
@@ -66,7 +68,7 @@ const insights: Insight[] = [
     confidence: 87,
     level: "High",
     icon: Clock,
-    theme: "emerald",
+    rank: "lead",
     signals: [
       { label: "OR delay", value: "+38 min", tone: "critical" },
       { label: "Recovery roster", value: "-2 RNs", tone: "warning" },
@@ -87,8 +89,8 @@ const insights: Insight[] = [
     action: "Schedule diagnostic",
     confidence: 92,
     level: "High",
-    icon: LineChart,
-    theme: "blue",
+    icon: Activity,
+    rank: "next",
     signals: [
       { label: "Retry rate", value: "12.4%", tone: "critical" },
       { label: "vs baseline", value: "3.2×", tone: "warning" },
@@ -109,8 +111,8 @@ const insights: Insight[] = [
     action: "Open calibration queue",
     confidence: 76,
     level: "Med",
-    icon: ShieldCheck,
-    theme: "blue",
+    icon: Gauge,
+    rank: "watch",
     signals: [
       { label: "Drift band", value: "±2.8%", tone: "warning" },
       { label: "Sensors", value: "4", tone: "neutral" },
@@ -126,20 +128,48 @@ const insights: Insight[] = [
   },
 ];
 
-const themes = {
-  emerald: {
-    card: "border-teal-200/60 bg-teal-50/40",
-    icon: "bg-teal-500/15 text-teal-700",
-    bar: "from-teal-500 to-teal-400",
-    btn: "border-teal-200/80 bg-white text-teal-900 hover:bg-teal-50",
+const ranks: Record<
+  InsightRank,
+  {
+    card: string;
+    icon: string;
+    bar: string;
+    spark: string;
+    stroke: string;
+  }
+> = {
+  lead: {
+    card: "bg-white",
+    icon: "bg-rose-500/12 text-rose-800",
+    bar: "bg-rose-500",
+    spark: "bg-blue-500/75",
+    stroke: "244 63 94",
   },
-  blue: {
-    card: "border-blue-200/60 bg-blue-50/40",
-    icon: "bg-blue-500/15 text-blue-700",
-    bar: "from-blue-600 to-blue-400",
-    btn: "border-blue-200/80 bg-white text-blue-900 hover:bg-blue-50",
+  next: {
+    card: "bg-white",
+    icon: "bg-amber-500/12 text-amber-800",
+    bar: "bg-amber-500",
+    spark: "bg-blue-500/75",
+    stroke: "245 158 11",
+  },
+  watch: {
+    card: "bg-white",
+    icon: "bg-teal-500/12 text-teal-800",
+    bar: "bg-teal-600",
+    spark: "bg-blue-500/75",
+    stroke: "13 148 136",
   },
 };
+
+const insightActionButtonClass =
+  "motion-interactive mt-2 h-7 shrink-0 rounded-lg border border-blue-600! bg-white text-[11px] font-medium text-blue-600 shadow-none hover:border-blue-600! hover:bg-blue-50 hover:text-blue-700 active:scale-[0.98]";
+
+/** 1px border — same weight as quick actions; hue + opacity follow rank and confidence. */
+function insightStrokeColor(rgb: string, confidence: number) {
+  const alpha =
+    0.14 + ((Math.min(100, Math.max(70, confidence)) - 70) / 30) * 0.14;
+  return `rgb(${rgb} / ${alpha.toFixed(3)})`;
+}
 
 const quickActions = [
   { label: "Daily ops report", icon: FileText },
@@ -175,9 +205,9 @@ export function AssistantInsightsRail() {
       aria-label="Intelligence context"
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 pt-0 lg:px-0 lg:pt-0">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="min-w-0 text-sm font-semibold text-slate-800">
-            Today’s insights
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="text-sm font-semibold text-slate-800">
+            Today's insights
           </h2>
           <button type="button" className={seeMoreClassName}>
             See more
@@ -185,24 +215,27 @@ export function AssistantInsightsRail() {
         </div>
         <ul className="mt-3 flex flex-col gap-2">
           {insights.map((item) => {
-            const T = themes[item.theme];
+            const T = ranks[item.rank];
             const Icon = item.icon;
             return (
               <li key={item.title}>
                 <div
                   className={cn(
-                    "flex w-full flex-col rounded-xl border p-3 text-left shadow-sm transition-shadow",
-                    "hover:shadow-md",
+                    "flex w-full flex-col rounded-xl border p-3 text-left",
+                    "transition-[border-color,background-color,box-shadow]",
                     T.card
                   )}
+                  style={{
+                    borderColor: insightStrokeColor(T.stroke, item.confidence),
+                  }}
                 >
-                  <Tooltip delayDuration={280}>
-                    <TooltipTrigger asChild>
+                  <HoverCard openDelay={280} closeDelay={160}>
+                    <HoverCardTrigger asChild>
                       <div
                         role="button"
                         tabIndex={0}
                         aria-label={`View AI reasoning for ${item.title}`}
-                        className="w-full cursor-default text-left outline-none ring-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35 focus-visible:ring-offset-0 data-[state=delayed-open]:ring-0 data-[state=instant-open]:ring-0"
+                        className="w-full cursor-pointer text-left outline-none ring-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35 focus-visible:ring-offset-0"
                       >
                         <div className="flex min-h-0 gap-2">
                           <div
@@ -239,24 +272,23 @@ export function AssistantInsightsRail() {
                               {item.confidence}%
                             </span>
                           </div>
-                          <div className="h-1 overflow-hidden rounded-full bg-white/80">
+                          <div className="h-1 overflow-hidden rounded-full bg-black/5">
                             <div
-                              className={cn(
-                                "h-full rounded-full bg-gradient-to-r",
-                                T.bar
-                              )}
+                              className={cn("h-full rounded-full", T.bar)}
                               style={{ width: `${item.confidence}%` }}
                             />
                           </div>
                         </div>
                       </div>
-                    </TooltipTrigger>
-                    <TooltipContent
+                    </HoverCardTrigger>
+                    <HoverCardContent
                       side="left"
                       align="start"
                       collisionPadding={12}
-                      arrowClassName={insightTooltipArrowClassName}
-                      className={insightTooltipClassName}
+                      className={cn(
+                        "z-[600] w-[min(100vw-2rem,24rem)] pointer-events-auto",
+                        insightTooltipClassName
+                      )}
                     >
                       <div>
                         <p className="text-[13px] font-semibold leading-snug text-slate-900">
@@ -301,7 +333,7 @@ export function AssistantInsightsRail() {
                           {item.sparkline.map((point, index) => (
                             <div
                               key={`${item.id}-spark-${index}`}
-                              className="min-w-0 flex-1 rounded-sm bg-blue-500/75"
+                              className={cn("min-w-0 flex-1 rounded-sm", T.spark)}
                               style={{ height: `${Math.max(18, point)}%` }}
                             />
                           ))}
@@ -337,17 +369,20 @@ export function AssistantInsightsRail() {
                       <p className="border-t border-blue-200/70 pt-2 text-[11px] text-slate-500">
                         Confidence {item.confidence}% · {item.level}
                       </p>
-                    </TooltipContent>
-                  </Tooltip>
+
+                      <AIResponseFeedback
+                        responseId={`insight:${item.id}`}
+                        source="insight-hover"
+                        variant="compact"
+                      />
+                    </HoverCardContent>
+                  </HoverCard>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => openActionModal(item)}
-                    className={cn(
-                      "motion-interactive mt-2 h-7 shrink-0 rounded-xl text-[11px] active:scale-[0.98]",
-                      T.btn
-                    )}
+                    className={insightActionButtonClass}
                   >
                     {item.action}
                   </Button>
@@ -372,7 +407,7 @@ export function AssistantInsightsRail() {
             <li key={label}>
               <button
                 type="button"
-                className="motion-interactive flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-2 text-left shadow-sm hover:border-blue-200/80 hover:bg-blue-50/40 hover:shadow-md active:scale-[0.99]"
+                className="motion-interactive flex w-full items-center gap-2 rounded-lg border border-slate-200/80 bg-white px-2 py-2 text-left hover:border-slate-300 hover:bg-slate-50/80 active:scale-[0.99]"
               >
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
                   <QIcon className="h-3.5 w-3.5" aria-hidden />

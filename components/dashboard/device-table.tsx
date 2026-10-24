@@ -541,7 +541,7 @@ export function DeviceTable({
             Device Action Queue
           </h2>
           <span className="text-[11px] leading-snug text-slate-500">
-            {actionRequiredCount} need attention · sorted by risk (highest first)
+            {actionRequiredCount} devices requiring action
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -749,30 +749,6 @@ export function DeviceTable({
               </SheetFooter>
             </SheetContent>
           </Sheet>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2 border-b border-black/10 bg-white px-5 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-          Quick focus
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {QUICK_FILTERS.map((q) => (
-            <button
-              key={q.id}
-              type="button"
-              onClick={() => setQuickFilter(q.id)}
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
-                "outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
-                quickFilter === q.id
-                  ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-              )}
-            >
-              {q.label}
-            </button>
-          ))}
         </div>
       </div>
 

@@ -14,14 +14,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Info } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { dashboardCardClass } from "@/lib/dashboard-surface";
+import {
+  dashboardCardClass,
+  dashboardChartColors,
+} from "@/lib/dashboard-surface";
 
 /** Sept → Aug (12 months). */
 const MONTHS = [
@@ -43,15 +41,14 @@ const MONTHS = [
 const OVERALL = [81, 82, 80, 83, 85, 83, 84, 85, 84, 83, 84, 84];
 const PREVENTATIVE = [70, 71, 70, 71, 72, 71, 72, 72, 71, 72, 72, 72];
 const CORRECTIVE = [85, 86, 85, 87, 88, 86, 87, 88, 87, 86, 87, 87];
-/** February = index 5 (Sep = 0). */
-const FEB_IDX = 5;
-
-const W = 520;
-const H = 228;
-const PAD_L = 44;
-const PAD_R = 16;
-const PAD_T = 14;
-const PAD_B = 34;
+const W = 560;
+const H = 168;
+const PAD_L = 36;
+const PAD_R = 10;
+const PAD_T = 12;
+const PAD_B = 26;
+const TARGET_LOW = 85;
+const TARGET_HIGH = 90;
 const INNER_W = W - PAD_L - PAD_R;
 const INNER_H = H - PAD_T - PAD_B;
 
@@ -97,19 +94,19 @@ const SERIES = [
   {
     key: "overall",
     label: "Overall",
-    color: "#2563eb",
+    color: dashboardChartColors.primaryDark,
     values: OVERALL,
   },
   {
     key: "preventative",
     label: "Preventative",
-    color: "#059669",
+    color: dashboardChartColors.primaryMid,
     values: PREVENTATIVE,
   },
   {
     key: "corrective",
     label: "Corrective",
-    color: "#f97316",
+    color: dashboardChartColors.primaryLight,
     values: CORRECTIVE,
   },
 ] as const;
@@ -118,8 +115,10 @@ const GRID_Y = [60, 70, 80, 90, 100] as const;
 
 export function MaintenanceComplianceChart({
   compact = false,
+  className,
 }: {
   compact?: boolean;
+  className?: string;
 }) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const [period, setPeriod] = useState("Monthly");
@@ -149,12 +148,16 @@ export function MaintenanceComplianceChart({
 
   return (
     <Card
-      className={cn(dashboardCardClass, "gap-0 py-0", compact ? "" : "h-full")}
+      className={cn(
+        dashboardCardClass,
+        "gap-0 py-0",
+        className
+      )}
     >
       <CardHeader
         className={cn(
-          "flex flex-row flex-wrap items-center justify-between gap-3 border-0",
-          compact ? "px-5 pb-3 pt-5" : "px-6 pb-4 pt-6"
+          "flex flex-row flex-wrap items-center justify-between gap-2 border-0",
+          compact ? "px-5 pb-2 pt-5" : "px-5 pb-2 pt-5"
         )}
       >
         <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-0.5">
@@ -172,7 +175,7 @@ export function MaintenanceComplianceChart({
               compact ? "text-xs" : "text-sm"
             )}
           >
-            % of devices meeting scheduled maintenance
+            % of devices meeting scheduled maintenance requirements
           </p>
         </div>
         <DropdownMenu>
@@ -199,13 +202,9 @@ export function MaintenanceComplianceChart({
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
-      <CardContent className={cn(compact ? "px-5 pb-5 pt-0" : "px-6 pb-6 pt-0")}>
-        <div
-          className={cn(
-            "flex flex-wrap items-center gap-4",
-            compact ? "mb-2 gap-2" : "mb-3"
-          )}
-        >
+      <CardContent className={cn("px-5 pb-4 pt-0", compact && "pb-3")}>
+        {compact ? null : (
+        <div className="mb-2 flex flex-wrap items-center gap-3">
           {SERIES.map((s) => (
             <div key={s.key} className="flex items-center gap-2 text-xs">
               <span
@@ -220,13 +219,14 @@ export function MaintenanceComplianceChart({
             </div>
           ))}
         </div>
+        )}
 
         <div className="relative w-full overflow-x-auto">
           <svg
             viewBox={`0 0 ${W} ${H}`}
             className={cn(
-              "min-w-[280px] w-full max-w-full touch-none select-none",
-              compact ? "h-[138px]" : "h-[248px]"
+              "min-w-[240px] w-full max-w-full touch-none select-none",
+              compact ? "h-[120px]" : "h-[168px]"
             )}
             role="img"
             aria-label="Twelve month maintenance compliance trend"
@@ -262,7 +262,7 @@ export function MaintenanceComplianceChart({
               <text
                 key={m}
                 x={xAt(i)}
-                y={H - 10}
+                y={H - 8}
                 textAnchor="middle"
                 className="fill-slate-500 text-[10px] font-medium"
               >
@@ -270,7 +270,19 @@ export function MaintenanceComplianceChart({
               </text>
             ))}
 
-            <path d={smoothArea(OVERALL)} className="fill-blue-600/[0.09]" />
+            <rect
+              x={PAD_L}
+              y={yAt(TARGET_HIGH)}
+              width={INNER_W}
+              height={yAt(TARGET_LOW) - yAt(TARGET_HIGH)}
+              fill={dashboardChartColors.targetBand}
+              rx={2}
+            />
+
+            <path
+              d={smoothArea(OVERALL)}
+              fill={dashboardChartColors.areaFill}
+            />
 
             {SERIES.map((s) => (
               <path
@@ -292,7 +304,8 @@ export function MaintenanceComplianceChart({
                   y1={PAD_T}
                   x2={xAt(hoverIdx)}
                   y2={PAD_T + INNER_H}
-                  className="stroke-blue-600/30"
+                  stroke={dashboardChartColors.primaryMid}
+                  strokeOpacity={0.35}
                   strokeWidth={1}
                 />
                 {SERIES.map((s) => {
@@ -350,50 +363,7 @@ export function MaintenanceComplianceChart({
                 ))}
               </ul>
             </div>
-          ) : (
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-500">
-              <span>Hover the chart for monthly values</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 font-semibold text-slate-700 shadow-sm transition-colors duration-150 hover:bg-slate-50"
-                  >
-                    <Info className="h-3.5 w-3.5 text-blue-600" aria-hidden />
-                    February snapshot
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  arrowClassName="bg-white fill-white ring-1 ring-slate-200/80"
-                  className="max-w-[240px] border-slate-200 bg-white p-3 text-slate-900 shadow-md"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                    {MONTHS[FEB_IDX]} (rolling year)
-                  </p>
-                  <ul className="mt-2 space-y-1.5 text-xs">
-                    {SERIES.map((s) => (
-                      <li
-                        key={s.key}
-                        className="flex justify-between gap-4 tabular-nums"
-                      >
-                        <span className="flex items-center gap-1.5 text-slate-600">
-                          <span
-                            className="h-1.5 w-1.5 rounded-full"
-                            style={{ backgroundColor: s.color }}
-                          />
-                          {s.label}
-                        </span>
-                        <span className="font-semibold">
-                          {s.values[FEB_IDX]}%
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          )}
+          ) : null}
         </div>
       </CardContent>
     </Card>

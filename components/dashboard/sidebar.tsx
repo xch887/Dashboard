@@ -201,14 +201,8 @@ export function Sidebar() {
         >
           <NavIcon
             className={cn(
-              "h-[18px] w-[18px] shrink-0 transition-colors duration-200",
-              variant === "admin"
-                ? isActive
-                  ? "text-slate-700"
-                  : "text-slate-400"
-                : isActive
-                  ? "text-blue-600"
-                  : "text-blue-600/65"
+              "h-3.5 w-3.5 shrink-0 transition-colors duration-200",
+              isActive ? "text-[#2859C5]" : "text-[#8FBFFA]"
             )}
             aria-hidden
           />

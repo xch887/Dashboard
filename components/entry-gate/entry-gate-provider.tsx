@@ -54,7 +54,10 @@ export function EntryGateProvider({
     setAssistantEntryGeneration((g) => g + 1);
     markExperienceEntered();
     setOverlay("none");
-    router.replace("/assistant");
+    const path = window.location.pathname;
+    if (path === "/" || path === "") {
+      router.replace("/assistant");
+    }
   }, [router]);
 
   return (

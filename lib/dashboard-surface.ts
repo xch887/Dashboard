@@ -2,10 +2,34 @@
  * Dashboard card surfaces — borderless white tiles with soft cool shadow.
  * Prefer `dashboardCardClass` over ad-hoc border + shadow combos.
  */
-export const dashboardCardRadius = "rounded-[8px]";
+export const dashboardCardRadius = "rounded-xl";
 
+/** Neutral lift — matches original MediSync+ dashboard tiles */
 export const dashboardCardShadow =
-  "shadow-[0_12px_40px_-16px_rgb(99_102_241/0.1)]";
+  "shadow-[0_1px_2px_rgb(15_23_42/0.06),0_8px_24px_-10px_rgb(15_23_42/0.1)]";
+
+/**
+ * Chart & status palette — aligned with globals.css health tokens and MediSync+ mock.
+ * @see app/globals.css `--color-health-*` and `--primary`
+ */
+export const dashboardChartColors = {
+  healthy: "#0d9488",
+  warning: "#ea580c",
+  critical: "#dc2626",
+  offline: "#94a3b8",
+  primary: "#2563eb",
+  primaryDark: "#1d4ed8",
+  primaryMid: "#3b82f6",
+  primaryLight: "#93c5fd",
+  targetBand: "rgb(134 239 172 / 0.35)",
+  areaFill: "rgb(37 99 235 / 0.08)",
+  trendPositive: "#16a34a",
+  trendNegative: "#ea580c",
+  inProgress: "#2563eb",
+  resolved: "#0d9488",
+  scheduled: "#ea580c",
+  overdue: "#dc2626",
+} as const;
 
 export const dashboardCardClass = [
   dashboardCardRadius,

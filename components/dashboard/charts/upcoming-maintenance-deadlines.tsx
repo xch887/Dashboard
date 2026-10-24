@@ -7,73 +7,24 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { dashboardCardClass } from "@/lib/dashboard-surface";
+import { DASHBOARD_DEADLINES } from "@/lib/dashboard-deadlines";
 import { CalendarClock } from "lucide-react";
 
-type Deadline = {
-  id: string;
-  title: string;
-  department: string;
-  deviceCount: number;
-  deviceLabel: string;
-  detail: string;
-  badge: string;
-  badgeVariant: "danger" | "warning" | "success" | "info";
-  barClass: string;
-};
-
-const DEADLINES: Deadline[] = [
-  {
-    id: "1",
-    title: "MRI Suite A: Preventative Maintenance",
-    department: "Radiology",
-    deviceCount: 1,
-    deviceLabel: "device",
-    detail: "Impact: Imaging temporarily unavailable during coil inspection window.",
-    badge: "High",
-    badgeVariant: "danger",
-    barClass: "bg-red-500",
-  },
-  {
-    id: "2",
-    title: "Infusion Pumps: Firmware Update",
-    department: "ICU",
-    deviceCount: 12,
-    deviceLabel: "devices",
-    detail: "Vendor security bundle — staged for after-hours push.",
-    badge: "Medium",
-    badgeVariant: "warning",
-    barClass: "bg-amber-500",
-  },
-  {
-    id: "3",
-    title: "Ventilators: Safety Inspection",
-    department: "ER",
-    deviceCount: 6,
-    deviceLabel: "devices",
-    detail: "Regulatory inspection due — biomed sign-off required.",
-    badge: "High",
-    badgeVariant: "danger",
-    barClass: "bg-red-500",
-  },
-  {
-    id: "4",
-    title: "Philips Ventilator Contract Renewal",
-    department: "Procurement",
-    deviceCount: 34,
-    deviceLabel: "devices affected",
-    detail: "Expires in 5 days — coverage: warranty lapses if not renewed.",
-    badge: "Urgent",
-    badgeVariant: "warning",
-    barClass: "bg-amber-500",
-  },
-];
+const barForVariant = (v: (typeof DASHBOARD_DEADLINES)[number]["badgeVariant"]) =>
+  v === "danger"
+    ? "bg-[var(--color-health-critical)]"
+    : v === "warning"
+      ? "bg-[var(--color-health-warning)]"
+      : v === "success"
+        ? "bg-[var(--color-health-healthy)]"
+        : "bg-[var(--color-health-info)]";
 
 export function UpcomingMaintenanceDeadlines({
   compact = false,
 }: {
   compact?: boolean;
 }) {
-  const rows = compact ? DEADLINES.slice(0, 3) : DEADLINES;
+  const rows = compact ? DASHBOARD_DEADLINES.slice(0, 3) : DASHBOARD_DEADLINES;
 
   return (
     <Card
@@ -189,7 +140,7 @@ export function UpcomingMaintenanceDeadlines({
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-300",
-                  d.barClass
+                  barForVariant(d.badgeVariant)
                 )}
                 style={{
                   width: `${100 - i * 18}%`,

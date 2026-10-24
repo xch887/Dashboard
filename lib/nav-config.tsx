@@ -1,50 +1,31 @@
 import type { ComponentType } from "react";
-import type { IconType } from "react-icons";
 import { OperationsIntelligenceNavIcon } from "@/components/dashboard/operations-intelligence-icon";
 import {
-  MdAssignment,
-  MdBarChart,
-  MdBuild,
-  MdBusiness,
-  MdCalendarToday,
-  MdDescription,
-  MdExtension,
-  MdHistory,
-  MdLocationOn,
-  MdOutlineAssignment,
-  MdOutlineBarChart,
-  MdOutlineBuild,
-  MdOutlineBusiness,
-  MdOutlineCalendarToday,
-  MdOutlineDescription,
-  MdOutlineExtension,
-  MdOutlineHistory,
-  MdOutlineLocationOn,
-  MdOutlinePeople,
-  MdOutlineSettings,
-  MdOutlineSmartphone,
-  MdOutlineSpaceDashboard,
-  MdOutlineTrendingUp,
-  MdOutlineWarning,
-  MdPeople,
-  MdSettings,
-  MdSmartphone,
-  MdSpaceDashboard,
-  MdTrendingUp,
-  MdWarning,
-} from "react-icons/md";
+  NavAlertsIcon,
+  NavAnalyticsIcon,
+  NavAuditIcon,
+  NavCalendarIcon,
+  NavDashboardIcon,
+  NavFleetIcon,
+  NavIntegrationsIcon,
+  NavLocationsIcon,
+  NavMaintenanceIcon,
+  NavReportsIcon,
+  NavSettingsIcon,
+  NavTrendsIcon,
+  NavUsersIcon,
+  NavVendorsIcon,
+  NavWorkOrdersIcon,
+} from "@/components/dashboard/nav-figma-icons";
 
-type NavIcon = IconType | ComponentType<{ className?: string }>;
+type NavIcon = ComponentType<{ className?: string; strokeWidth?: number }>;
 
 export type NavItem = {
   label: string;
-  /** Material-style: outlined when route inactive. */
   iconOutline: NavIcon;
-  /** Material-style: filled when route active. */
   iconFilled: NavIcon;
   href: string;
   badge?: number;
-  /** Sidebar badge color by highest-severity item in that queue (demo). */
   badgeTone?: "critical" | "warning" | "neutral";
 };
 
@@ -53,10 +34,12 @@ export type NavSectionData = {
   items: NavItem[];
 };
 
-/**
- * Flip to `true` when the Dashboard route should appear in the sidebar and at `/` again.
- */
+/** Fleet readiness dashboard — keep the route, hide from this prototype’s nav. */
 export const SHOW_DASHBOARD_IN_NAV = false;
+
+function both(icon: NavIcon): Pick<NavItem, "iconOutline" | "iconFilled"> {
+  return { iconOutline: icon, iconFilled: icon };
+}
 
 const navSectionsSource: NavSectionData[] = [
   {
@@ -64,46 +47,39 @@ const navSectionsSource: NavSectionData[] = [
     items: [
       {
         label: "Intelligence",
-        iconOutline: OperationsIntelligenceNavIcon,
-        iconFilled: OperationsIntelligenceNavIcon,
+        ...both(OperationsIntelligenceNavIcon),
         href: "/assistant",
       },
       {
         label: "Dashboard",
-        iconOutline: MdOutlineSpaceDashboard,
-        iconFilled: MdSpaceDashboard,
+        ...both(NavDashboardIcon),
         href: "/dashboard",
       },
       {
         label: "Fleet",
-        iconOutline: MdOutlineSmartphone,
-        iconFilled: MdSmartphone,
+        ...both(NavFleetIcon),
         href: "/fleet",
       },
       {
         label: "Alerts & Incidents",
-        iconOutline: MdOutlineWarning,
-        iconFilled: MdWarning,
+        ...both(NavAlertsIcon),
         href: "/alerts",
         badge: 4,
         badgeTone: "critical",
       },
       {
         label: "Calendar",
-        iconOutline: MdOutlineCalendarToday,
-        iconFilled: MdCalendarToday,
+        ...both(NavCalendarIcon),
         href: "/calendar",
       },
       {
         label: "Work Orders",
-        iconOutline: MdOutlineAssignment,
-        iconFilled: MdAssignment,
+        ...both(NavWorkOrdersIcon),
         href: "/work-orders",
       },
       {
         label: "Maintenance",
-        iconOutline: MdOutlineBuild,
-        iconFilled: MdBuild,
+        ...both(NavMaintenanceIcon),
         href: "/maintenance",
         badge: 5,
         badgeTone: "warning",
@@ -115,28 +91,24 @@ const navSectionsSource: NavSectionData[] = [
     items: [
       {
         label: "Analytics",
-        iconOutline: MdOutlineBarChart,
-        iconFilled: MdBarChart,
+        ...both(NavAnalyticsIcon),
         href: "/analytics",
       },
       {
         label: "Trends & Forecasts",
-        iconOutline: MdOutlineTrendingUp,
-        iconFilled: MdTrendingUp,
+        ...both(NavTrendsIcon),
         href: "/trends",
         badge: 10,
         badgeTone: "neutral",
       },
       {
         label: "Audit Log",
-        iconOutline: MdOutlineHistory,
-        iconFilled: MdHistory,
+        ...both(NavAuditIcon),
         href: "/audit-log",
       },
       {
         label: "Reports",
-        iconOutline: MdOutlineDescription,
-        iconFilled: MdDescription,
+        ...both(NavReportsIcon),
         href: "/reports",
       },
     ],
@@ -146,32 +118,27 @@ const navSectionsSource: NavSectionData[] = [
     items: [
       {
         label: "Users & Roles",
-        iconOutline: MdOutlinePeople,
-        iconFilled: MdPeople,
+        ...both(NavUsersIcon),
         href: "/users",
       },
       {
         label: "Locations",
-        iconOutline: MdOutlineLocationOn,
-        iconFilled: MdLocationOn,
+        ...both(NavLocationsIcon),
         href: "/locations",
       },
       {
         label: "Integrations",
-        iconOutline: MdOutlineExtension,
-        iconFilled: MdExtension,
+        ...both(NavIntegrationsIcon),
         href: "/integrations",
       },
       {
         label: "Vendor Management",
-        iconOutline: MdOutlineBusiness,
-        iconFilled: MdBusiness,
+        ...both(NavVendorsIcon),
         href: "/vendors",
       },
       {
         label: "System Settings",
-        iconOutline: MdOutlineSettings,
-        iconFilled: MdSettings,
+        ...both(NavSettingsIcon),
         href: "/settings",
       },
     ],
@@ -185,9 +152,7 @@ export const navSections: NavSectionData[] = SHOW_DASHBOARD_IN_NAV
       items: section.items.filter((item) => item.href !== "/dashboard"),
     }));
 
-/** Landing target for logo / root when Dashboard is hidden. */
-export const appHomeHref = SHOW_DASHBOARD_IN_NAV ? "/dashboard" : "/assistant";
+export const appHomeHref = "/assistant";
 
-/** Sidebar: Operations + Insights scroll above; Admin pinned to the bottom. */
 export const sidebarNavTop = navSections.filter((s) => s.label !== "ADMIN");
 export const sidebarNavAdmin = navSections.find((s) => s.label === "ADMIN");

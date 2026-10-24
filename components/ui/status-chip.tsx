@@ -39,11 +39,11 @@ export function PriorityStrip({
 }) {
   const bar =
     level === "High"
-      ? "bg-red-600"
+      ? "bg-[var(--color-health-critical)]"
       : level === "Med"
-        ? "bg-amber-500"
+        ? "bg-[var(--color-health-warning)]"
         : level === "Low"
-          ? "bg-orange-500"
+          ? "bg-[var(--color-health-healthy)]"
           : "bg-slate-300";
 
   return (

@@ -9,7 +9,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { dashboardCardClass } from "@/lib/dashboard-surface";
+import {
+  dashboardCardClass,
+  dashboardChartColors,
+} from "@/lib/dashboard-surface";
 import { RefreshCw } from "lucide-react";
 
 const CX = 100;
@@ -25,10 +28,30 @@ type TaskSlice = {
 };
 
 const TASKS: TaskSlice[] = [
-  { key: "overdue", label: "Overdue", count: 45, color: "#ef4444" },
-  { key: "scheduled", label: "Scheduled", count: 29, color: "#eab308" },
-  { key: "in_progress", label: "In progress", count: 66, color: "#3b82f6" },
-  { key: "resolved", label: "Resolved", count: 39, color: "#059669" },
+  {
+    key: "overdue",
+    label: "Overdue",
+    count: 45,
+    color: dashboardChartColors.overdue,
+  },
+  {
+    key: "scheduled",
+    label: "Scheduled",
+    count: 29,
+    color: dashboardChartColors.scheduled,
+  },
+  {
+    key: "in_progress",
+    label: "In progress",
+    count: 66,
+    color: dashboardChartColors.inProgress,
+  },
+  {
+    key: "resolved",
+    label: "Resolved",
+    count: 39,
+    color: dashboardChartColors.resolved,
+  },
 ];
 
 const TOTAL = TASKS.reduce((a, t) => a + t.count, 0);
@@ -37,6 +60,9 @@ function polar(cx: number, cy: number, r: number, angleFromTopDeg: number) {
   const rad = ((angleFromTopDeg - 90) * Math.PI) / 180;
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 }
+
+const GAUGE_START = 135;
+const GAUGE_SWEEP = 270;
 
 function donutSegment(startAngle: number, sweepAngle: number, padDeg = 0.4) {
   const s = startAngle + padDeg;
@@ -68,11 +94,13 @@ export function MaintenanceStatusDonut({
 
   const segments = useMemo(() => {
     return TASKS.map((t, i) => {
-      const angle = TASKS.slice(0, i).reduce(
-        (a, x) => a + (x.count / TOTAL) * 360,
-        0
-      );
-      const d = donutSegment(angle, (t.count / TOTAL) * 360);
+      const angle =
+        GAUGE_START +
+        TASKS.slice(0, i).reduce(
+          (a, x) => a + (x.count / TOTAL) * GAUGE_SWEEP,
+          0
+        );
+      const d = donutSegment(angle, (t.count / TOTAL) * GAUGE_SWEEP);
       return {
         ...t,
         d,
@@ -93,16 +121,35 @@ export function MaintenanceStatusDonut({
     >
       <CardHeader
         className={cn(
-          "border-b border-slate-100",
-          compact ? "px-5 pb-3 pt-5" : "px-6 pb-4 pt-6"
+          compact
+            ? "flex-row items-start justify-between space-y-0 px-4 pb-2 pt-4"
+            : "border-b border-slate-100 px-6 pb-4 pt-6"
         )}
       >
-        <CardTitle className="text-base font-semibold text-slate-900">
-          Maintenance status
-        </CardTitle>
-        <p className="text-xs text-slate-500">
-          Open work queue across sites — excludes vendor-only tickets
-        </p>
+        <div>
+          <CardTitle
+            className={cn(
+              "font-semibold text-slate-900",
+              compact ? "text-sm" : "text-base"
+            )}
+          >
+            Maintenance Status
+          </CardTitle>
+          <p className="text-[11px] text-slate-500">
+            {compact
+              ? "Last update 1 day ago"
+              : "Open work queue across sites — excludes vendor-only tickets"}
+          </p>
+        </div>
+        {compact ? (
+          <button
+            type="button"
+            className="rounded-md p-1 text-slate-400 hover:bg-slate-50 hover:text-slate-600"
+            aria-label="Refresh maintenance status"
+          >
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        ) : null}
       </CardHeader>
       <CardContent className={cn("pt-5", compact && "pt-3")}>
         <div
@@ -166,15 +213,40 @@ export function MaintenanceStatusDonut({
           </div>
 
           <div className="w-full min-w-0 flex-1 space-y-1">
-            <p
-              className={cn(
-                "mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400",
-                compact && "mb-1"
-              )}
-            >
+            {compact ? (
+              <ul className="grid grid-cols-2 gap-2">
+                {segments.map((seg) => (
+                  <li key={seg.key}>
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex w-full flex-col items-start rounded-xl border border-slate-100 bg-white px-2.5 py-2 text-left shadow-[0_1px_2px_rgb(15_23_42/0.04)]",
+                        hovered === seg.key && "ring-1 ring-slate-200"
+                      )}
+                      onMouseEnter={() => setHovered(seg.key)}
+                      onMouseLeave={() => setHovered(null)}
+                    >
+                      <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-800">
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: seg.color }}
+                          aria-hidden
+                        />
+                        {seg.label} · {Math.round(seg.pct)}%
+                      </span>
+                      <span className="mt-1 text-[10px] text-slate-400">
+                        Total — {seg.count}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <>
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
               Queue
             </p>
-            <ul className={cn("space-y-2", compact && "space-y-1")}>
+            <ul className="space-y-2">
               {segments.map((seg) => (
                 <li key={seg.key}>
                   <button
@@ -216,9 +288,12 @@ export function MaintenanceStatusDonut({
                 {active.pct}% of queue ({active.count} tasks)
               </p>
             ) : null}
+              </>
+            )}
           </div>
         </div>
       </CardContent>
+      {compact ? null : (
       <CardFooter className="flex items-center gap-2 border-t border-black/10 py-3 text-xs text-slate-500">
         <RefreshCw
           className="h-3.5 w-3.5 shrink-0 text-slate-400"
@@ -226,6 +301,7 @@ export function MaintenanceStatusDonut({
         />
         <span>Last update 1 day ago</span>
       </CardFooter>
+      )}
     </Card>
   );
 }

@@ -1,4 +1,5 @@
 export { AIResponseCard } from "@/components/assistant/ai-response-card";
+export { AIResponseFeedback } from "@/components/assistant/ai-response-feedback";
 export { ChatPanel } from "@/components/assistant/chat-panel";
 export { EmptyState } from "@/components/assistant/empty-state";
 export { FollowUpQuestions } from "@/components/assistant/follow-up-questions";

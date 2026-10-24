@@ -9,17 +9,17 @@ import { DeviceTable } from "@/components/dashboard/device-table";
 import { DeviceHealthOverview } from "@/components/dashboard/charts/device-health-overview";
 import { MaintenanceComplianceChart } from "@/components/dashboard/charts/maintenance-compliance-chart";
 import { MaintenanceStatusDonut } from "@/components/dashboard/charts/maintenance-status-donut";
-import { DashboardWeekCalendar } from "@/components/dashboard/charts/dashboard-week-calendar";
-import { UpcomingMaintenanceDeadlines } from "@/components/dashboard/charts/upcoming-maintenance-deadlines";
+import {
+  DashboardWeekCalendarPanel,
+  DashboardDeadlinesPanel,
+} from "@/components/dashboard/charts/dashboard-calendar-deadlines";
 import { cn } from "@/lib/utils";
 import {
   dashboardCardGridGap,
   dashboardCardStackGap,
 } from "@/lib/dashboard-surface";
 
-/**
- * KPI row → middle band (narrow compliance chart + widget grid) → full-width Device Action Queue.
- */
+/** MediSync+ dashboard: KPIs + health → compliance + right rail → action queue. */
 export function DashboardPageContent() {
   const [toast, setToast] = useState<string | null>(null);
   const reduceMotion = useReducedMotion();
@@ -54,33 +54,49 @@ export function DashboardPageContent() {
         ) : null}
       </AnimatePresence>
 
-      <div className={dashboardCardStackGap}>
-        <KpiCards density="dashboard" onToast={showToast} />
-
-        <div className={cn("grid lg:grid-cols-12 lg:items-start", dashboardCardGridGap)}>
-          <div className="min-w-0 lg:col-span-4 xl:col-span-3">
-            <MaintenanceComplianceChart compact />
-          </div>
-
+      <div
+        className={cn(
+          "grid items-start lg:grid-cols-12",
+          dashboardCardGridGap
+        )}
+      >
+        <div
+          className={cn(
+            "flex min-w-0 flex-col lg:col-span-8",
+            dashboardCardStackGap
+          )}
+        >
           <div
             className={cn(
-              "grid min-w-0 sm:grid-cols-2 lg:col-span-8 xl:col-span-9",
+              "grid items-stretch sm:grid-cols-12",
               dashboardCardGridGap
             )}
-            aria-label="Dashboard widgets"
           >
-            <DeviceHealthOverview compact />
-            <DashboardWeekCalendar compact />
-            <div className="min-w-0 sm:col-span-2">
-              <UpcomingMaintenanceDeadlines compact />
-            </div>
-            <div className="min-w-0 sm:col-span-2">
-              <MaintenanceStatusDonut compact />
-            </div>
+            <KpiCards
+              density="dashboard"
+              layout="quarter"
+              className="min-w-0 sm:col-span-7"
+              onToast={showToast}
+            />
+            <DeviceHealthOverview
+              mini
+              className="min-w-0 sm:col-span-5"
+            />
           </div>
+          <MaintenanceComplianceChart compact className="min-w-0" />
+          <DeviceTable riskStyle="pill" onToast={showToast} />
         </div>
 
-        <DeviceTable riskStyle="pill" onToast={showToast} />
+        <div
+          className={cn(
+            "flex min-w-0 flex-col lg:col-span-4",
+            dashboardCardStackGap
+          )}
+        >
+          <DashboardWeekCalendarPanel />
+          <DashboardDeadlinesPanel />
+          <MaintenanceStatusDonut compact />
+        </div>
       </div>
     </>
   );

@@ -32,8 +32,10 @@ function sameDay(a: Date, b: Date) {
 
 export function DashboardWeekCalendar({
   compact = false,
+  className,
 }: {
   compact?: boolean;
+  className?: string;
 }) {
   const today = useMemo(() => new Date(), []);
   const [weekStart, setWeekStart] = useState(() => startOfWeekMonday(today));
@@ -62,7 +64,8 @@ export function DashboardWeekCalendar({
       className={cn(
         dashboardCardClass,
         "gap-0 py-0",
-        compact ? "p-5" : "p-6"
+        compact ? "p-5" : "p-6",
+        className
       )}
     >
       <div className={cn("flex items-center justify-between", compact ? "mb-2" : "mb-3")}>

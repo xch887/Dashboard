@@ -1,6 +1,7 @@
 /**
  * Session gate for the full-screen entry experience (any first load in the app).
- * Wired in root layout via `EntryGateProvider`. After continue, the app navigates to `/assistant`.
+ * Wired in root layout via `EntryGateProvider`. After continue from `/`, the app
+ * navigates to `/assistant`. Other URLs stay put.
  *
  * Testing:
  * - Append `?intro=1` to `/` to force the intro even if already entered this session.

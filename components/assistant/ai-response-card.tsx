@@ -4,6 +4,7 @@ import type {
   SuggestedAction,
 } from "@/lib/assistant/types";
 import { cn } from "@/lib/utils";
+import { AIResponseFeedback } from "@/components/assistant/ai-response-feedback";
 import { FollowUpQuestions } from "@/components/assistant/follow-up-questions";
 import { SuggestedActions } from "@/components/assistant/suggested-actions";
 
@@ -17,6 +18,7 @@ const confidenceStyles: Record<
 };
 
 export function AIResponseCard({
+  responseId,
   data,
   demo,
   pendingAction,
@@ -26,6 +28,7 @@ export function AIResponseCard({
   onFollowUp,
   interactionsDisabled,
 }: {
+  responseId: string;
   data: AssistantStructuredResponse;
   demo?: boolean;
   pendingAction: SuggestedAction | null;
@@ -102,6 +105,12 @@ export function AIResponseCard({
         <FollowUpQuestions
           questions={data.follow_up_questions}
           onSelect={onFollowUp}
+          disabled={interactionsDisabled}
+        />
+
+        <AIResponseFeedback
+          responseId={responseId}
+          source="assistant-response"
           disabled={interactionsDisabled}
         />
       </div>
