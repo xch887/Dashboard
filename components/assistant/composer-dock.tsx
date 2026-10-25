@@ -62,28 +62,19 @@ const TONIGHT = [
   },
 ] as const;
 
-/** Short chips — one-tap lookups, not decision forks. */
+/** Phrase chips — one-tap asks, same voice as a typed question. */
 const SUGGESTED_CHIPS = [
   {
-    label: "Vent #6 owner",
-    prompt: "Who owns the open safety inspection on Ventilator #6?",
+    label: "Tonight's shift priorities",
+    prompt: "What should Clinical Engineering prioritize before tonight's shift?",
   },
   {
-    label: "4 West offline",
-    prompt: "Which devices are offline on 4 West right now?",
+    label: "Open risk summary",
+    prompt: "Summarize open risk across the fleet that needs action tonight.",
   },
   {
-    label: "On-call Biomed",
-    prompt:
-      "Who is on call for Clinical Engineering if 4 West pages before first case?",
-  },
-  {
-    label: "ICU West retries",
-    prompt: "Show ICU West pump retries compared with east ICU since v2.14.",
-  },
-  {
-    label: "MRI Suite A PM",
-    prompt: "What is still open on MRI Suite A PM, and when is the next window?",
+    label: "PM compliance this week",
+    prompt: "How is PM compliance this week versus the 95% goal?",
   },
 ] as const;
 
@@ -227,8 +218,8 @@ export function ComposerDock({
                     type="button"
                     onClick={() => submit(chip.prompt)}
                     className={cn(
-                      "motion-interactive rounded-full border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600",
-                      "hover:border-[#8FBFFA] hover:bg-white hover:text-slate-800",
+                      "motion-interactive rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-medium text-slate-700",
+                      "hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
                     )}
                   >

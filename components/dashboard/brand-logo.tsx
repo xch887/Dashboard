@@ -59,13 +59,13 @@ export function MediSyncLogoMark({
   return (
     <div
       className={cn(
-        "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl",
+        "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
         "bg-white shadow-sm shadow-slate-900/[0.06] ring-1 ring-slate-200/90",
         className
       )}
       aria-hidden
     >
-      <MediSyncSyncGlyph className="h-7 w-7" />
+      <MediSyncSyncGlyph className="h-5 w-5" />
     </div>
   );
 }

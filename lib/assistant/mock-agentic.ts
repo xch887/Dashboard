@@ -6,6 +6,20 @@ export type DecisionOption = {
   summary: string;
   effect: string;
   recommended?: boolean;
+  /** Short why this path fits the evidence (shown when selected / recommended). */
+  because?: string;
+};
+
+export type DecisionEvidence = {
+  metric: string;
+  value: string;
+  source: string;
+  note?: string;
+};
+
+export type DecisionReasoningStep = {
+  claim: string;
+  from: string;
 };
 
 export type DecisionCase = {
@@ -27,6 +41,10 @@ export type DecisionCase = {
     ifWait: string;
     confidence: string;
   };
+  /** Live signals the agent is weighing — always visible beside the walkthrough. */
+  evidence: DecisionEvidence[];
+  /** Ordered chain from data → conclusion. */
+  reasoning: DecisionReasoningStep[];
   options: DecisionOption[];
 };
 
@@ -78,6 +96,50 @@ export const DECISION_CASES: DecisionCase[] = [
       ifWait: "Case 4 starts ~22 min later and recovery remains −2 through the first two cases.",
       confidence: "High · 87%",
     },
+    evidence: [
+      {
+        metric: "First-case delay",
+        value: "+38 min",
+        source: "OR schedule",
+        note: "+22 min vs Tuesday pattern",
+      },
+      {
+        metric: "Recovery roster",
+        value: "−2 RNs",
+        source: "Staff roster",
+        note: "Through first two cases",
+      },
+      {
+        metric: "Queued cases",
+        value: "3",
+        source: "OR board",
+        note: "Case 3 = elective ortho, no hard start",
+      },
+      {
+        metric: "PACU float",
+        value: "1 RN",
+        source: "PACU census",
+        note: "Drops coverage ~2 hours if floated",
+      },
+    ],
+    reasoning: [
+      {
+        claim: "Board is already late and recovery is short two RNs.",
+        from: "OR schedule · Staff roster",
+      },
+      {
+        claim: "Floating PACU covers recovery but thins post-op for the next block.",
+        from: "PACU census",
+      },
+      {
+        claim: "Case 3 is the only queued delay that does not hit a hard start.",
+        from: "OR board · Anesthesia notes",
+      },
+      {
+        claim: "Holding Case 3 protects wheels-in without pulling PACU.",
+        from: "Combined signals",
+      },
+    ],
     options: [
       {
         id: "hold",
@@ -85,18 +147,22 @@ export const DECISION_CASES: DecisionCase[] = [
         summary: "Delay the elective. Protect first-case wheels-in and keep PACU intact.",
         effect: "OR board updates · surgeon office notified",
         recommended: true,
+        because:
+          "Evidence shows Case 3 is the only safe delay and PACU float costs two hours of coverage.",
       },
       {
         id: "float",
         label: "Float 1 RN from PACU",
         summary: "Cover recovery now. PACU census drops for the next two hours.",
         effect: "Charge nurse paged · assignment log",
+        because: "Use if Case 3 cannot slip — census allows one float, not two.",
       },
       {
         id: "watch",
         label: "Watch 15 minutes",
         summary: "No move yet. Only use this if a float is already walking.",
         effect: "Timer set · no board change",
+        because: "Does not change roster or board; delay will keep growing.",
       },
     ],
   },
@@ -128,6 +194,50 @@ export const DECISION_CASES: DecisionCase[] = [
       ifWait: "Night charge inherits the cluster with no rollback owner on site.",
       confidence: "High · 82%",
     },
+    evidence: [
+      {
+        metric: "West retry rate",
+        value: "12.4%",
+        source: "Telemetry",
+        note: "3.2× pre-update baseline",
+      },
+      {
+        metric: "East ICU control",
+        value: "Quiet",
+        source: "Telemetry",
+        note: "Same window, no spike",
+      },
+      {
+        metric: "Days on v2.14",
+        value: "6",
+        source: "Firmware log",
+        note: "Rollout still incomplete on West",
+      },
+      {
+        metric: "Rollback image",
+        value: "Staged",
+        source: "Biomed queue",
+        note: "Ready for tonight",
+      },
+    ],
+    reasoning: [
+      {
+        claim: "Retries jumped only on ICU West after v2.14.",
+        from: "Telemetry · Firmware log",
+      },
+      {
+        claim: "East ICU stayed flat — not a fleet-wide battery or wireless event.",
+        from: "East ICU control",
+      },
+      {
+        claim: "A staged rollback image is already available tonight.",
+        from: "Biomed queue",
+      },
+      {
+        claim: "Pausing now avoids handing an unmanaged cluster to night shift.",
+        from: "Combined signals",
+      },
+    ],
     options: [
       {
         id: "pause",
@@ -135,12 +245,15 @@ export const DECISION_CASES: DecisionCase[] = [
         summary: "Freeze West. Roll remaining units back to the staged image tonight.",
         effect: "Biomed queue · firmware freeze",
         recommended: true,
+        because:
+          "Localized spike + staged rollback makes pause the lowest-risk move before night shift.",
       },
       {
         id: "ride",
         label: "Ride it out until morning",
         summary: "Watch retries. Page only if the rate crosses 15%.",
         effect: "Alert threshold · morning huddle",
+        because: "Only if night biomed coverage is confirmed and retries stay under 15%.",
       },
     ],
   },
@@ -172,6 +285,50 @@ export const DECISION_CASES: DecisionCase[] = [
       ifWait: "4 West starts first case on out-of-band sensors, or scrambles mid-morning.",
       confidence: "Med · 74%",
     },
+    evidence: [
+      {
+        metric: "Sensors out of band",
+        value: "4",
+        source: "Cal records",
+        note: "4 West floor",
+      },
+      {
+        metric: "Drift vs vendor",
+        value: "±2.8%",
+        source: "Vendor baseline",
+        note: "Limit ±2.0%",
+      },
+      {
+        metric: "Last calibration",
+        value: "92 days",
+        source: "Cal ledger",
+        note: "Past interval",
+      },
+      {
+        metric: "Matching loaners",
+        value: "Unconfirmed",
+        source: "Inventory",
+        note: "Asked 20 min ago",
+      },
+    ],
+    reasoning: [
+      {
+        claim: "Four sensors exceed the ±2% vendor band.",
+        from: "Cal records · Vendor baseline",
+      },
+      {
+        claim: "Last cal was 92 days ago — overdue for this modality.",
+        from: "Cal ledger",
+      },
+      {
+        claim: "Loaner stock is not confirmed for four matching units.",
+        from: "Inventory",
+      },
+      {
+        claim: "In-place cal after last case does not depend on loaners.",
+        from: "Combined signals",
+      },
+    ],
     options: [
       {
         id: "cal",
@@ -179,12 +336,15 @@ export const DECISION_CASES: DecisionCase[] = [
         summary: "Take the four sensors after last case. No dependency on loaner stock.",
         effect: "Cal bay reserved · 4 West notified",
         recommended: true,
+        because:
+          "Drift is confirmed and loaners are not — cal removes the inventory dependency.",
       },
       {
         id: "loan",
         label: "Swap loaners before first case",
         summary: "Cover the morning. Confirm stock in the next 20 minutes or fall back to cal.",
         effect: "Inventory chase · fallback timer",
+        because: "Only if inventory confirms four units in the next 20 minutes.",
       },
     ],
   },

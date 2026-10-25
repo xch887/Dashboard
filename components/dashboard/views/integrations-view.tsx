@@ -305,7 +305,8 @@ export function IntegrationsView() {
             </Button>
             <Button
               size="sm"
-              className="h-9 gap-1.5 rounded-xl bg-blue-700 px-4 font-semibold text-white hover:bg-blue-800"
+              variant="outline"
+              className="h-9 gap-1.5 rounded-xl border-slate-200 bg-white px-4 font-semibold text-slate-800 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
               type="button"
             >
               <Plus className="h-3.5 w-3.5" aria-hidden />

@@ -64,6 +64,13 @@ export const dashboardMainInsetRight = "right-3";
 /** Nudge page headers off the canvas gutter (~half of SectionCard padding) */
 export const dashboardPageHeaderInset = "pl-2.5 sm:pl-3";
 
+/**
+ * Quiet page / card CTAs — outline only, no filled blue or drop shadow.
+ * Use with Button `variant="outline"`.
+ */
+export const dashboardQuietActionClass =
+  "h-9 gap-1.5 rounded-xl border-slate-200 bg-white px-4 font-semibold text-slate-800 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900";
+
 /** @deprecated Use dashboardCardClass — kept for gradual migration */
 export const dashboardTileOutline = "border-0";
 

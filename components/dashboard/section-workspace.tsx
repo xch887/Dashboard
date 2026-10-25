@@ -16,7 +16,8 @@ export function SectionWorkspace({ config }: { config: SectionPageConfig }) {
         actions={
           <Button
             size="sm"
-            className="h-9 gap-1.5 rounded-lg bg-blue-600 px-4 font-semibold text-white hover:bg-blue-700"
+            variant="outline"
+            className="h-9 gap-1.5 rounded-xl border-slate-200 bg-white px-4 font-semibold text-slate-800 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
           >
             Primary action
             <ArrowUpRight className="h-3.5 w-3.5" />

@@ -359,7 +359,8 @@ export function MaintenanceView() {
         actions={
           <Button
             size="sm"
-            className="h-9 gap-1.5 rounded-xl bg-blue-700 px-4 font-semibold text-white shadow-[0_8px_20px_-8px_rgb(37_99_235/0.5)] hover:bg-blue-800"
+            variant="outline"
+            className="h-9 gap-1.5 rounded-xl border-slate-200 bg-white px-4 font-semibold text-slate-800 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
           >
             <Plus className="h-4 w-4" />
             Schedule new tasks

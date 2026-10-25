@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import type {
   AssistantStructuredResponse,
   SuggestedAction,
@@ -20,7 +19,6 @@ const confidenceStyles: Record<
 export function AIResponseCard({
   responseId,
   data,
-  demo,
   pendingAction,
   onActionSelect,
   onActionConfirm,
@@ -53,14 +51,6 @@ export function AIResponseCard({
           >
             Confidence · {data.confidence}
           </span>
-          {demo ? (
-            <Badge
-              variant="outline"
-              className="border-amber-200/80 bg-amber-50/80 text-[10px] font-semibold text-amber-950"
-            >
-              Demo response
-            </Badge>
-          ) : null}
         </div>
         <p className="mt-2 text-[11px] leading-snug text-slate-500">
           <span className="font-semibold text-slate-600">Reasoning scope:</span>{" "}

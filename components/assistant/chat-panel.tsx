@@ -15,8 +15,10 @@ import {
   type PastChat,
 } from "@/components/assistant/chat-history-panel";
 import { ComposerDock } from "@/components/assistant/composer-dock";
+import { DecisionFlow } from "@/components/assistant/decision-flow";
 import { EmptyState } from "@/components/assistant/empty-state";
 import { LoadingState } from "@/components/assistant/loading-state";
+import { WorkflowSetup } from "@/components/assistant/workflow-setup";
 import type {
   ApiAssistantResponse,
   AssistantStructuredResponse,
@@ -28,7 +30,7 @@ import { useBrowserClock } from "@/lib/browser-clock";
 import { SHOW_DASHBOARD_IN_NAV } from "@/lib/nav-config";
 import { motionTransition } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, X } from "lucide-react";
 
 /** Ops-intelligence mark used in the briefing header. */
 const ASSISTANT_HERO_ICON = "/brand/operations-intelligence-icon.svg";
@@ -58,10 +60,29 @@ export function ChatPanel() {
   );
   const [outcome, setOutcome] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [agentic, setAgentic] = useState<
+    | { kind: "decision"; id: string }
+    | { kind: "workflow"; id: string }
+    | null
+  >(null);
   const liveClock = useBrowserClock();
 
   const openHistory = useCallback(() => {
     setHistoryOpen(true);
+  }, []);
+
+  const openDecision = useCallback((caseId: string) => {
+    setAgentic({ kind: "decision", id: caseId });
+    setHistoryOpen(false);
+  }, []);
+
+  const openWorkflow = useCallback((jobId: string) => {
+    setAgentic({ kind: "workflow", id: jobId });
+    setHistoryOpen(false);
+  }, []);
+
+  const closeAgentic = useCallback(() => {
+    setAgentic(null);
   }, []);
 
   const scrollToEnd = useCallback(() => {
@@ -82,6 +103,8 @@ export function ChatPanel() {
       setOutcome(null);
       setPendingAction(null);
       setPendingForMessageId(null);
+      setAgentic(null);
+      setHistoryOpen(false);
 
       const userMsg: ChatMessage = {
         id: crypto.randomUUID(),
@@ -186,6 +209,7 @@ export function ChatPanel() {
     setPendingAction(null);
     setPendingForMessageId(null);
     setHistoryOpen(false);
+    setAgentic(null);
   }, []);
 
   const openPastChat = useCallback((chat: PastChat) => {
@@ -193,6 +217,7 @@ export function ChatPanel() {
     setOutcome(null);
     setPendingAction(null);
     setPendingForMessageId(null);
+    setAgentic(null);
     setInput("");
     setMessages([
       { id: `${chat.id}-user`, role: "user", text: chat.userText },
@@ -221,9 +246,17 @@ export function ChatPanel() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={motionTransition(reduceMotion, "fast")}
-            className="mb-3 rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-3 py-2 text-xs font-medium text-emerald-950 ring-1 ring-emerald-100"
+            className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-3 py-2 text-xs font-medium text-emerald-950 ring-1 ring-emerald-100"
           >
-            {outcome}
+            <span className="min-w-0 flex-1">{outcome}</span>
+            <button
+              type="button"
+              aria-label="Dismiss"
+              onClick={() => setOutcome(null)}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-emerald-800/70 hover:bg-emerald-100 hover:text-emerald-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+            >
+              <X className="h-3.5 w-3.5" strokeWidth={2} />
+            </button>
           </motion.div>
         ) : null}
       </AnimatePresence>
@@ -250,6 +283,54 @@ export function ChatPanel() {
               />
             </div>
           </motion.div>
+        ) : agentic?.kind === "decision" ? (
+          <motion.div
+            key={`decision-${agentic.id}`}
+            className="flex h-full min-h-0 w-full min-w-0 flex-1 flex-col"
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: reduceMotion ? 0 : -6 }}
+            transition={motionTransition(reduceMotion, "base")}
+          >
+            <div
+              className={cn(
+                sectionPanelClass,
+                "relative flex min-h-0 flex-1 flex-col overflow-hidden"
+              )}
+            >
+              <DecisionFlow
+                caseId={agentic.id}
+                onBack={closeAgentic}
+                onCommitted={(option) => {
+                  setOutcome(`Decision recorded: ${option.label}`);
+                }}
+              />
+            </div>
+          </motion.div>
+        ) : agentic?.kind === "workflow" ? (
+          <motion.div
+            key={`workflow-${agentic.id}`}
+            className="flex h-full min-h-0 w-full min-w-0 flex-1 flex-col"
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: reduceMotion ? 0 : -6 }}
+            transition={motionTransition(reduceMotion, "base")}
+          >
+            <div
+              className={cn(
+                sectionPanelClass,
+                "relative flex min-h-0 flex-1 flex-col overflow-hidden"
+              )}
+            >
+              <WorkflowSetup
+                jobId={agentic.id}
+                onBack={closeAgentic}
+                onArmed={(job) => {
+                  setOutcome(`Workflow armed: ${job.title}`);
+                }}
+              />
+            </div>
+          </motion.div>
         ) : messages.length === 0 ? (
           <motion.div
             key="empty"
@@ -266,7 +347,7 @@ export function ChatPanel() {
                 "relative flex min-h-0 flex-1 flex-col overflow-hidden"
               )}
             >
-                <header className="flex shrink-0 items-center justify-between gap-3 px-5 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5 lg:px-7">
+                <header className="flex shrink-0 items-center justify-between gap-3 px-5 pb-2.5 pt-3.5 sm:px-6 sm:pb-3 sm:pt-4 lg:px-7">
                   <div className="flex min-w-0 items-center gap-2.5">
                     <Image
                       src={ASSISTANT_HERO_ICON}
@@ -278,7 +359,7 @@ export function ChatPanel() {
                       aria-hidden
                       className="h-5 w-5 object-contain"
                     />
-                    <h1 className="truncate text-base font-semibold leading-6 tracking-tight text-slate-900 sm:text-lg sm:leading-7">
+                    <h1 className="truncate text-base font-semibold leading-6 tracking-tight text-slate-800 sm:text-lg sm:leading-7">
                       Operations Intelligence
                     </h1>
                   </div>
@@ -296,7 +377,10 @@ export function ChatPanel() {
                 </header>
 
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 sm:px-6 lg:px-7">
-                  <EmptyState onSelectSuggestion={(s) => void sendText(s)} />
+                  <EmptyState
+                    onOpenDecision={openDecision}
+                    onOpenWorkflow={openWorkflow}
+                  />
                 </div>
 
                 <ComposerDock

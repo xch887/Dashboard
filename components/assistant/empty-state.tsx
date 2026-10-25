@@ -1,6 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { BarChart3, Bell, FileText, UserPlus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   HoverCard,
   HoverCardContent,
@@ -8,10 +16,11 @@ import {
 } from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 
-/** Suggested prompts shown on the Intelligence empty state. */
+/** Decision cards on the Intelligence empty state — open a walkthrough, not chat. */
 export const ASSISTANT_PROMPT_OPTIONS = [
   {
     rank: "Lead" as const,
+    caseId: "or-block",
     title: "Hold a case, or float PACU?",
     consequence:
       "If recovery stays two RNs short, which queued case is safest to delay — and who can float before first case?",
@@ -29,6 +38,7 @@ export const ASSISTANT_PROMPT_OPTIONS = [
   },
   {
     rank: "Next" as const,
+    caseId: "icu-firmware",
     title: "Pause v2.14, or ride it out?",
     consequence:
       "ICU West retries are 3.2× baseline and east ICU is quiet. Rollback tonight vs monitor until morning.",
@@ -46,6 +56,7 @@ export const ASSISTANT_PROMPT_OPTIONS = [
   },
   {
     rank: "Watch" as const,
+    caseId: "west-cal",
     title: "Calibrate in place, or swap loaners?",
     consequence:
       "Four 4 West sensors sit outside band with last cal 92 days ago. Batch tonight vs loaner swap before first case.",
@@ -86,65 +97,326 @@ const signalToneClass = {
   neutral: "bg-slate-50 text-slate-700 ring-slate-200/80",
 } as const;
 
-/** Compact strip — same numbers/words as dashboard KPIs, not the card chrome. */
-const SYSTEM_PULSE = [
+type MetricRow = {
+  name: string;
+  meta: string;
+  status: string;
+  tone: "critical" | "warning" | "neutral";
+};
+
+type MetricPulse = {
+  id: "failures" | "maintenance" | "resolution" | "fleet";
+  label: string;
+  value: string;
+  hint: string;
+  title: string;
+  detail: string;
+  cta: string;
+  source: string;
+  /** Week trend for Resolution / Fleet mini charts. */
+  series?: number[];
+  seriesLabel?: string;
+  seriesTone?: "bad" | "good";
+  rows: MetricRow[];
+};
+
+/** Compact strip — same numbers/words as dashboard KPIs, with list CTAs. */
+const SYSTEM_PULSE: MetricPulse[] = [
   {
+    id: "failures",
     label: "Failures",
     value: "441",
     hint: "devices",
     title: "441 predicted failures",
     detail:
-      "Risk concentrates on 4 West calibration drift and overdue PM. Four sensors sit outside the ±2% vendor band.",
-    facts: [
-      { label: "Cal drift", value: "4 sensors" },
-      { label: "Last cal", value: "92 days" },
-      { label: "vs last week", value: "+5.2%" },
-    ],
+      "Risk concentrates on 4 West calibration drift and overdue PM.",
+    cta: "View list",
     source: "Cal records · Risk model",
+    rows: [
+      {
+        name: "4 West SpO₂ sensors (×4)",
+        meta: "Drift ±2.8% · last cal 92d",
+        status: "High risk",
+        tone: "critical",
+      },
+      {
+        name: "ICU West infusion pumps",
+        meta: "Retry spike after v2.14",
+        status: "High risk",
+        tone: "critical",
+      },
+      {
+        name: "Ventilator #6",
+        meta: "Safety inspection open",
+        status: "Watch",
+        tone: "warning",
+      },
+      {
+        name: "MRI Suite A coil set",
+        meta: "PM overdue · Radiology",
+        status: "Watch",
+        tone: "warning",
+      },
+      {
+        name: "ER stretcher fleet (12)",
+        meta: "Battery health declining",
+        status: "Monitor",
+        tone: "neutral",
+      },
+    ],
   },
   {
+    id: "maintenance",
     label: "Maintenance",
     value: "179",
     hint: "tasks",
     title: "179 active maintenance tasks",
     detail:
-      "Radiology MRI Suite A and ICU West infusion pumps account for most of the remaining window before Joint Commission.",
-    facts: [
-      { label: "Open PMs", value: "MRI A · ICU West" },
-      { label: "vs last week", value: "+2.1%" },
-      { label: "Window", value: "This week" },
-    ],
+      "Radiology MRI Suite A and ICU West pumps hold most of the open window.",
+    cta: "View list",
     source: "PM ledger · Department queue",
+    rows: [
+      {
+        name: "MRI Suite A — preventative",
+        meta: "Radiology · due this week",
+        status: "Overdue",
+        tone: "critical",
+      },
+      {
+        name: "ICU West pumps — firmware",
+        meta: "12 devices · staged rollback",
+        status: "In progress",
+        tone: "warning",
+      },
+      {
+        name: "Ventilators — safety inspection",
+        meta: "ER · 6 devices",
+        status: "Due tonight",
+        tone: "warning",
+      },
+      {
+        name: "Philips vent contract",
+        meta: "Expires in 5 days",
+        status: "Admin",
+        tone: "neutral",
+      },
+      {
+        name: "4 West cal bay hold",
+        meta: "Batch after last case",
+        status: "Scheduled",
+        tone: "neutral",
+      },
+    ],
   },
   {
+    id: "resolution",
     label: "Resolution",
     value: "4.3",
     hint: "hours",
     title: "Average resolution 4.3 hours",
     detail:
-      "Slightly slower than last week. First-case delay and ICU West retries are pulling techs off the queue.",
-    facts: [
-      { label: "vs last week", value: "+0.8%" },
-      { label: "First case", value: "+38 min" },
-      { label: "Retry spike", value: "ICU West" },
-    ],
+      "Slightly slower than last week — first-case delay and ICU West retries.",
+    cta: "View trend",
     source: "Work orders · Telemetry",
+    series: [4.0, 4.05, 4.1, 4.15, 4.2, 4.25, 4.3],
+    seriesLabel: "Avg hours · last 7 days",
+    seriesTone: "bad",
+    rows: [
+      {
+        name: "WO-4821 · Vent #6 inspection",
+        meta: "Opened 6.2h ago · Biomed",
+        status: "6.2h",
+        tone: "warning",
+      },
+      {
+        name: "WO-4814 · ICU West pump cluster",
+        meta: "Opened 5.1h ago · Night shift",
+        status: "5.1h",
+        tone: "warning",
+      },
+      {
+        name: "WO-4809 · MRI Suite A PM",
+        meta: "Closed yesterday · 3.8h",
+        status: "3.8h",
+        tone: "neutral",
+      },
+      {
+        name: "WO-4802 · 4 West sensor swap",
+        meta: "Closed yesterday · 4.9h",
+        status: "4.9h",
+        tone: "warning",
+      },
+      {
+        name: "WO-4795 · PACU float coverage",
+        meta: "Closed Tue · 2.4h",
+        status: "2.4h",
+        tone: "neutral",
+      },
+    ],
   },
   {
+    id: "fleet",
     label: "Fleet",
     value: "77%",
     hint: "available",
     title: "77% of fleet available",
     detail:
-      "Availability is held down by 253 offline devices and 339 in a critical state. ICU West retries are the fastest-moving slip.",
-    facts: [
-      { label: "Critical", value: "339" },
-      { label: "Offline", value: "253" },
-      { label: "vs last week", value: "+1.4%" },
-    ],
+      "Held down by 253 offline and 339 critical. ICU West is the fastest slip.",
+    cta: "View mix",
     source: "Telemetry · Fleet inventory",
+    series: [72, 73, 74, 74, 75, 76, 77],
+    seriesLabel: "Availability % · last 7 days",
+    seriesTone: "good",
+    rows: [
+      {
+        name: "Healthy",
+        meta: "6,940 devices",
+        status: "82%",
+        tone: "neutral",
+      },
+      {
+        name: "Warning",
+        meta: "931 devices",
+        status: "11%",
+        tone: "warning",
+      },
+      {
+        name: "Critical",
+        meta: "339 devices",
+        status: "4%",
+        tone: "critical",
+      },
+      {
+        name: "Offline",
+        meta: "253 devices",
+        status: "3%",
+        tone: "critical",
+      },
+      {
+        name: "ICU West slip",
+        meta: "Retry spike · pumps",
+        status: "Hot",
+        tone: "warning",
+      },
+    ],
   },
-] as const;
+];
+
+const rowToneClass = {
+  critical: "bg-red-50 text-red-800 ring-red-200/80",
+  warning: "bg-amber-50 text-amber-900 ring-amber-200/80",
+  neutral: "bg-slate-50 text-slate-700 ring-slate-200/80",
+} as const;
+
+function MetricSpark({
+  values,
+  tone,
+  className,
+}: {
+  values: number[];
+  tone: "bad" | "good";
+  className?: string;
+}) {
+  const w = 72;
+  const h = 22;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const pts = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * w;
+    const y = h - 3 - ((v - min) / span) * (h - 6);
+    return `${i === 0 ? "M" : "L"} ${x} ${y}`;
+  });
+  const line = pts.join(" ");
+  const area = `${line} L ${w} ${h} L 0 ${h} Z`;
+  const stroke = tone === "good" ? "#17C964" : "#F31260";
+  const fill =
+    tone === "good" ? "rgba(23,201,100,0.14)" : "rgba(243,18,96,0.12)";
+
+  return (
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      className={cn("h-[22px] w-[72px]", className)}
+      aria-hidden
+    >
+      <path d={area} fill={fill} />
+      <path
+        d={line}
+        fill="none"
+        stroke={stroke}
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function MetricTrendChart({
+  values,
+  tone,
+  label,
+}: {
+  values: number[];
+  tone: "bad" | "good";
+  label: string;
+}) {
+  const w = 320;
+  const h = 96;
+  const pad = 8;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const pts = values.map((v, i) => {
+    const x = pad + (i / (values.length - 1)) * (w - pad * 2);
+    const y = h - pad - ((v - min) / span) * (h - pad * 2);
+    return { x, y, v };
+  });
+  const line = pts
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
+    .join(" ");
+  const area = `${line} L ${w - pad} ${h - pad} L ${pad} ${h - pad} Z`;
+  const stroke = tone === "good" ? "#17C964" : "#F31260";
+  const fill =
+    tone === "good" ? "rgba(23,201,100,0.12)" : "rgba(243,18,96,0.1)";
+
+  return (
+    <div className="rounded-xl bg-slate-50 px-3 py-3 ring-1 ring-slate-200/80">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+        {label}
+      </p>
+      <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 h-24 w-full" aria-hidden>
+        <path d={area} fill={fill} />
+        <path
+          d={line}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="2.25"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {pts.map((p, i) => (
+          <circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r={i === pts.length - 1 ? 3.5 : 2.25}
+            fill={i === pts.length - 1 ? stroke : "#fff"}
+            stroke={stroke}
+            strokeWidth={1.5}
+          />
+        ))}
+      </svg>
+      <div className="mt-1 flex justify-between text-[10px] text-slate-400">
+        <span>7 days ago</span>
+        <span className="font-semibold tabular-nums text-slate-700">
+          Now · {values[values.length - 1]}
+          {tone === "good" ? "%" : "h"}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 const WORKFLOWS = [
   {
@@ -195,24 +467,32 @@ function WorkflowMark({ kind }: { kind: (typeof WORKFLOWS)[number]["key"] }) {
   const Icon = WORKFLOW_ICONS[kind];
   return (
     <span
-      className="flex h-8 w-8 shrink-0 items-center justify-center"
+      className="flex h-7 w-7 shrink-0 items-center justify-center"
       aria-hidden
     >
-      <Icon className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
+      <Icon className="h-3.5 w-3.5 text-slate-500" strokeWidth={1.75} />
     </span>
   );
 }
 
 export function EmptyState({
-  onSelectSuggestion,
+  onOpenDecision,
+  onOpenWorkflow,
 }: {
-  onSelectSuggestion: (text: string) => void;
+  onOpenDecision: (caseId: string) => void;
+  onOpenWorkflow: (jobId: string) => void;
 }) {
+  const [openMetricId, setOpenMetricId] = useState<MetricPulse["id"] | null>(
+    null
+  );
+  const openMetric =
+    SYSTEM_PULSE.find((item) => item.id === openMetricId) ?? null;
+
   return (
-    <div className="flex min-h-full w-full flex-1 flex-col pb-4">
-      <div className="flex shrink-0 flex-wrap items-end gap-x-6 gap-y-3 border-b border-slate-100 pb-5 sm:pb-6">
+    <div className="flex min-h-full w-full flex-1 flex-col pb-2">
+      <div className="flex shrink-0 flex-wrap items-end gap-x-5 gap-y-2 border-b border-slate-100 pb-3.5">
         {SYSTEM_PULSE.map((item) => (
-          <HoverCard key={item.label} openDelay={120} closeDelay={80}>
+          <HoverCard key={item.id} openDelay={120} closeDelay={120}>
             <HoverCardTrigger asChild>
               <button
                 type="button"
@@ -234,7 +514,7 @@ export function EmptyState({
               side="bottom"
               sideOffset={8}
               collisionPadding={12}
-              className="z-[600] w-[20rem] space-y-2.5 bg-white p-3 shadow-lg"
+              className="z-[600] w-[22rem] space-y-3 bg-white p-3 shadow-lg"
             >
               <div>
                 <p className="text-[13px] font-semibold leading-snug text-slate-900">
@@ -244,25 +524,117 @@ export function EmptyState({
                   {item.detail}
                 </p>
               </div>
-              <ul className="flex flex-wrap gap-1.5">
-                {item.facts.map((fact) => (
+              {item.series && item.seriesTone && item.seriesLabel ? (
+                <div className="rounded-lg bg-slate-50 px-2.5 py-2 ring-1 ring-slate-200/80">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    {item.seriesLabel}
+                  </p>
+                  <div className="mt-1.5 flex items-end justify-between gap-2">
+                    <MetricSpark
+                      values={item.series}
+                      tone={item.seriesTone}
+                      className="h-7 w-28"
+                    />
+                    <span className="text-[12px] font-semibold tabular-nums text-slate-800">
+                      {item.series[item.series.length - 1]}
+                      {item.seriesTone === "good" ? "%" : "h"}
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+              <ul className="space-y-1.5">
+                {item.rows.slice(0, 3).map((row) => (
                   <li
-                    key={fact.label}
-                    className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 ring-1 ring-inset ring-slate-200/80"
+                    key={row.name}
+                    className="flex items-start justify-between gap-2 text-[11px]"
                   >
-                    <span className="text-slate-500">{fact.label}</span>
-                    <span className="tabular-nums">{fact.value}</span>
+                    <span className="min-w-0">
+                      <span className="block font-medium text-slate-800">
+                        {row.name}
+                      </span>
+                      <span className="text-slate-500">{row.meta}</span>
+                    </span>
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ring-1 ring-inset",
+                        rowToneClass[row.tone]
+                      )}
+                    >
+                      {row.status}
+                    </span>
                   </li>
                 ))}
               </ul>
               <p className="text-[11px] text-slate-400">{item.source}</p>
+              <button
+                type="button"
+                onClick={() => setOpenMetricId(item.id)}
+                className="motion-interactive w-full rounded-lg bg-[#2859C5] px-3 py-2 text-[12px] font-semibold text-white hover:bg-[#1e4aa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+              >
+                {item.cta}
+              </button>
             </HoverCardContent>
           </HoverCard>
         ))}
       </div>
 
-      <div className="mt-6 flex min-h-0 flex-1 flex-col">
-        <div className="mb-3 flex shrink-0 items-baseline justify-between gap-3 sm:mb-3.5">
+      <Dialog
+        open={openMetricId !== null}
+        onOpenChange={(open) => {
+          if (!open) setOpenMetricId(null);
+        }}
+      >
+        <DialogContent className="max-w-lg gap-0 overflow-hidden p-0 sm:max-w-xl">
+          {openMetric ? (
+            <>
+              <DialogHeader className="border-b border-slate-100 px-5 py-4 pr-12">
+                <DialogTitle>{openMetric.title}</DialogTitle>
+                <DialogDescription>{openMetric.detail}</DialogDescription>
+              </DialogHeader>
+              <div className="max-h-[min(28rem,60vh)] space-y-4 overflow-y-auto px-5 py-4">
+                {openMetric.series &&
+                openMetric.seriesTone &&
+                openMetric.seriesLabel ? (
+                  <MetricTrendChart
+                    values={openMetric.series}
+                    tone={openMetric.seriesTone}
+                    label={openMetric.seriesLabel}
+                  />
+                ) : null}
+                <ul className="space-y-2">
+                  {openMetric.rows.map((row) => (
+                    <li
+                      key={row.name}
+                      className="flex items-start justify-between gap-3 rounded-xl bg-slate-50/80 px-3 py-2.5 ring-1 ring-slate-200/70"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-[13px] font-semibold text-slate-900">
+                          {row.name}
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-slate-500">
+                          {row.meta}
+                        </p>
+                      </div>
+                      <span
+                        className={cn(
+                          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ring-1 ring-inset",
+                          rowToneClass[row.tone]
+                        )}
+                      >
+                        {row.status}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-slate-400">{openMetric.source}</p>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      <div className="mt-4 shrink-0">
+        <div className="mb-2 flex items-baseline justify-between gap-3">
           <div className="flex items-baseline gap-2">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
               Needs a decision
@@ -276,16 +648,16 @@ export function EmptyState({
           </p>
         </div>
 
-        <ul className="flex min-h-0 flex-1 flex-col gap-2.5">
+        <ul className="flex flex-col gap-2">
           {ASSISTANT_PROMPT_OPTIONS.map((item) => {
             const tone = accentClass[item.accent];
             return (
-              <li key={item.rank} className="flex min-h-0 flex-1">
+              <li key={item.rank}>
                 <button
                   type="button"
-                  onClick={() => onSelectSuggestion(item.prompt)}
+                  onClick={() => onOpenDecision(item.caseId)}
                   className={cn(
-                    "motion-interactive group flex h-full min-h-[6.5rem] w-full gap-3 rounded-2xl px-3.5 py-3.5 text-left sm:gap-4 sm:px-4 sm:py-4",
+                    "motion-interactive group flex w-full gap-2.5 rounded-xl px-3 py-2.5 text-left sm:gap-3 sm:px-3.5 sm:py-3",
                     "bg-slate-50/80 ring-1 ring-slate-200/70",
                     "hover:bg-white hover:ring-slate-300/90",
                     tone.wash,
@@ -300,13 +672,13 @@ export function EmptyState({
                     aria-hidden
                   />
                   <span className="flex min-w-0 flex-1 flex-col justify-center">
-                    <span className="text-[15px] font-semibold tracking-tight text-slate-900">
+                    <span className="text-[14px] font-semibold tracking-tight text-slate-900">
                       {item.title}
                     </span>
-                    <span className="mt-1 max-w-2xl text-[13px] leading-snug text-slate-500">
+                    <span className="mt-0.5 line-clamp-2 max-w-2xl text-[12px] leading-snug text-slate-500">
                       {item.consequence}
                     </span>
-                    <span className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                    <span className="mt-1.5 flex flex-wrap items-center gap-1">
                       {item.signals.map((signal) => (
                         <span
                           key={signal.label}
@@ -326,11 +698,9 @@ export function EmptyState({
                   </span>
                   <span
                     className={cn(
-                      "hidden shrink-0 self-center rounded-lg px-2.5 py-1.5 text-[12px] font-semibold text-[#2859C5] sm:inline",
+                      "hidden shrink-0 self-center rounded-lg px-2 py-1 text-[11px] font-semibold text-[#2859C5] sm:inline",
                       "transition-[background-color,color,box-shadow,transform] duration-150",
-                      /* Card hover: soft cue that this is the action */
                       "group-hover:bg-blue-50/80 group-hover:text-[#1e4aa8]",
-                      /* Direct CTA hover: solid button feel */
                       "hover:bg-[#2859C5] hover:text-white hover:shadow-sm hover:shadow-blue-600/20",
                       "active:scale-[0.98]"
                     )}
@@ -344,8 +714,8 @@ export function EmptyState({
         </ul>
       </div>
 
-      <div className="mt-auto shrink-0 pt-6">
-        <div className="mb-3 flex items-baseline justify-between gap-3 sm:mb-3.5">
+      <div className="mt-5 shrink-0">
+        <div className="mb-2 flex items-baseline justify-between gap-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
             Workflows
           </p>
@@ -364,9 +734,9 @@ export function EmptyState({
             >
               <button
                 type="button"
-                onClick={() => onSelectSuggestion(item.prompt)}
+                onClick={() => onOpenWorkflow(item.key)}
                 className={cn(
-                  "motion-interactive flex h-full w-full gap-3 px-3.5 py-4 text-left sm:py-5",
+                  "motion-interactive flex h-full w-full gap-2.5 px-3 py-2.5 text-left sm:py-3",
                   "hover:bg-slate-50/80",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35 focus-visible:ring-inset"
                 )}
@@ -381,10 +751,10 @@ export function EmptyState({
                       {item.meta}
                     </span>
                   </span>
-                  <span className="mt-1 block text-[13px] font-semibold tracking-tight text-slate-900">
+                  <span className="mt-0.5 block text-[13px] font-semibold tracking-tight text-slate-900">
                     {item.title}
                   </span>
-                  <span className="mt-0.5 block text-[12px] leading-snug text-slate-500">
+                  <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">
                     {item.detail}
                   </span>
                 </span>

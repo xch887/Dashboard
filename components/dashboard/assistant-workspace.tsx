@@ -49,7 +49,7 @@ export function AssistantWorkspace() {
   return (
     <motion.div
       className={cn(
-        "flex h-full min-h-0 w-full flex-1 flex-col gap-y-3 lg:flex-row lg:items-start lg:gap-x-5 lg:gap-y-0",
+        "flex h-full min-h-0 w-full flex-1 flex-col gap-y-3 lg:flex-row lg:items-stretch lg:gap-x-5 lg:gap-y-0",
         dashboardMainInset
       )}
       variants={container}
@@ -71,7 +71,10 @@ export function AssistantWorkspace() {
       >
         <ChatPanel />
       </motion.div>
-      <motion.div variants={item} className="min-h-0 w-full shrink-0 lg:w-auto lg:self-stretch">
+      <motion.div
+        variants={item}
+        className="flex min-h-0 w-full shrink-0 flex-col lg:h-auto lg:w-auto"
+      >
         <AssistantInsightsRail />
       </motion.div>
     </motion.div>
