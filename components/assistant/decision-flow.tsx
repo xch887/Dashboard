@@ -454,29 +454,22 @@ export function DecisionFlow({
                       );
                     })}
                   </ul>
-                  <div className="lg:hidden">
-                    <EvidencePanel decision={decision} />
-                  </div>
                 </div>
               ) : null}
             </div>
           </div>
 
-          <div className="hidden lg:block">
-            <div className="sticky top-0">
-              <EvidencePanel decision={decision} />
-              {(step === "why" || done) && !done ? (
-                <div className="mt-3 rounded-xl border border-slate-200/90 bg-white p-3.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                    Confidence
-                  </p>
-                  <p className="mt-1 text-[13px] font-semibold text-slate-900">
-                    {decision.why.confidence}
-                  </p>
-                </div>
-              ) : null}
+          {!done && (step === "situation" || step === "why") ? (
+            <div className="hidden lg:block">
+              <div className="sticky top-0">
+                {step === "situation" ? (
+                  <SituationEvidencePanel decision={decision} />
+                ) : (
+                  <WhyStakesPanel decision={decision} />
+                )}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
 
