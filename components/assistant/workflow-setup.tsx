@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { AIResponseFeedback } from "@/components/assistant/ai-response-feedback";
 import {
   workflowJobById,
   type WorkflowJob,
-  type WorkflowNode,
 } from "@/lib/assistant/mock-agentic";
-import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   Bell,
@@ -16,17 +15,6 @@ import {
   ShieldCheck,
   UserPlus,
 } from "lucide-react";
-
-const NODE_KIND_STYLE: Record<
-  WorkflowNode["kind"],
-  { label: string; tone: string }
-> = {
-  watch: { label: "Watch", tone: "bg-slate-100 text-slate-700" },
-  collect: { label: "Collect", tone: "bg-sky-50 text-sky-800" },
-  draft: { label: "Draft", tone: "bg-violet-50 text-violet-800" },
-  approve: { label: "Approve", tone: "bg-amber-50 text-amber-900" },
-  deliver: { label: "Deliver", tone: "bg-emerald-50 text-emerald-800" },
-};
 
 const VERB_ICON = {
   Report: FileText,
@@ -159,40 +147,27 @@ export function WorkflowSetup({
                   Agent steps
                 </p>
                 <ol className="mt-3 space-y-0">
-                  {job.nodes.map((node, index) => {
-                    const kind = NODE_KIND_STYLE[node.kind];
-                    return (
-                      <li key={node.id} className="relative flex gap-3 pb-4 last:pb-0">
-                        {index < job.nodes.length - 1 ? (
-                          <span
-                            className="absolute left-[11px] top-7 bottom-0 w-px bg-slate-200"
-                            aria-hidden
-                          />
-                        ) : null}
-                        <span className="relative z-[1] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-semibold tabular-nums text-slate-600 ring-1 ring-slate-200">
-                          {index + 1}
-                        </span>
-                        <div className="min-w-0 flex-1 pt-0.5">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[13px] font-semibold text-slate-900">
-                              {node.label}
-                            </span>
-                            <span
-                              className={cn(
-                                "rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
-                                kind.tone
-                              )}
-                            >
-                              {kind.label}
-                            </span>
-                          </div>
-                          <p className="mt-1 text-[12px] leading-snug text-slate-500">
-                            {node.detail}
-                          </p>
-                        </div>
-                      </li>
-                    );
-                  })}
+                  {job.nodes.map((node, index) => (
+                    <li key={node.id} className="relative flex gap-3 pb-4 last:pb-0">
+                      {index < job.nodes.length - 1 ? (
+                        <span
+                          className="absolute left-[11px] top-7 bottom-0 w-px bg-slate-200"
+                          aria-hidden
+                        />
+                      ) : null}
+                      <span className="relative z-[1] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-semibold tabular-nums text-slate-600 ring-1 ring-slate-200">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0 flex-1 pt-0.5">
+                        <p className="text-[13px] font-semibold text-slate-900">
+                          {node.label}
+                        </p>
+                        <p className="mt-1 text-[12px] leading-snug text-slate-500">
+                          {node.detail}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
                 </ol>
               </div>
 
@@ -218,25 +193,34 @@ export function WorkflowSetup({
         </div>
       </div>
 
-      {!armed ? (
-        <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 sm:px-5">
-          <button
-            type="button"
-            onClick={onBack}
-            className="motion-interactive h-9 rounded-lg px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={arm}
-            className="motion-interactive inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#2859C5] px-4 text-sm font-semibold text-white hover:bg-[#1e4aa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
-          >
-            <Check className="h-3.5 w-3.5" strokeWidth={2.25} />
-            Arm workflow
-          </button>
-        </footer>
-      ) : null}
+      <footer className="shrink-0 border-t border-slate-100 bg-white px-4 py-3 sm:px-5">
+        <AIResponseFeedback
+          responseId={`workflow:${job.id}`}
+          source="workflow-setup"
+          className="mt-0 border-t-0 pt-0"
+          actions={
+            !armed ? (
+              <>
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="motion-interactive h-9 rounded-lg px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={arm}
+                  className="motion-interactive inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#2859C5] px-4 text-sm font-semibold text-white hover:bg-[#1e4aa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+                >
+                  <Check className="h-3.5 w-3.5" strokeWidth={2.25} />
+                  Arm workflow
+                </button>
+              </>
+            ) : null
+          }
+        />
+      </footer>
     </div>
   );
 }

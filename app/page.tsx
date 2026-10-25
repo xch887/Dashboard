@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
-import { appHomeHref } from "@/lib/nav-config";
-
+/**
+ * Launch route — EntryGateProvider shows the green MediSync launcher here.
+ * After continue, the gate navigates to `/assistant`.
+ */
 export default function Home() {
-  redirect(appHomeHref);
+  return <div className="min-h-dvh bg-[#ecfdf5]" aria-hidden />;
 }

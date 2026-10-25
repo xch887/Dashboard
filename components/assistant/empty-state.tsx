@@ -467,10 +467,14 @@ function WorkflowMark({ kind }: { kind: (typeof WORKFLOWS)[number]["key"] }) {
   const Icon = WORKFLOW_ICONS[kind];
   return (
     <span
-      className="flex h-7 w-7 shrink-0 items-center justify-center"
+      className={cn(
+        "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+        "text-slate-500 transition-[background-color,color] duration-150",
+        "group-hover:bg-[#2859C5]/[0.1] group-hover:text-[#2859C5]"
+      )}
       aria-hidden
     >
-      <Icon className="h-3.5 w-3.5 text-slate-500" strokeWidth={1.75} />
+      <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
     </span>
   );
 }
@@ -489,8 +493,8 @@ export function EmptyState({
     SYSTEM_PULSE.find((item) => item.id === openMetricId) ?? null;
 
   return (
-    <div className="flex min-h-full w-full flex-1 flex-col pb-2">
-      <div className="flex shrink-0 flex-wrap items-end gap-x-5 gap-y-2 border-b border-slate-100 pb-3.5">
+    <div className="flex min-h-full w-full flex-1 flex-col pb-4">
+      <div className="flex shrink-0 flex-wrap items-end gap-x-5 gap-y-2 border-b border-slate-100 pb-5">
         {SYSTEM_PULSE.map((item) => (
           <HoverCard key={item.id} openDelay={120} closeDelay={120}>
             <HoverCardTrigger asChild>
@@ -633,8 +637,8 @@ export function EmptyState({
         </DialogContent>
       </Dialog>
 
-      <div className="mt-4 shrink-0">
-        <div className="mb-2 flex items-baseline justify-between gap-3">
+      <div className="mt-6 shrink-0">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
           <div className="flex items-baseline gap-2">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
               Needs a decision
@@ -648,7 +652,7 @@ export function EmptyState({
           </p>
         </div>
 
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2.5">
           {ASSISTANT_PROMPT_OPTIONS.map((item) => {
             const tone = accentClass[item.accent];
             return (
@@ -657,7 +661,7 @@ export function EmptyState({
                   type="button"
                   onClick={() => onOpenDecision(item.caseId)}
                   className={cn(
-                    "motion-interactive group flex w-full gap-2.5 rounded-xl px-3 py-2.5 text-left sm:gap-3 sm:px-3.5 sm:py-3",
+                    "motion-interactive group flex w-full gap-2.5 rounded-xl px-3.5 py-3 text-left sm:gap-3 sm:px-4 sm:py-3.5",
                     "bg-slate-50/80 ring-1 ring-slate-200/70",
                     "hover:bg-white hover:ring-slate-300/90",
                     tone.wash,
@@ -675,10 +679,10 @@ export function EmptyState({
                     <span className="text-[14px] font-semibold tracking-tight text-slate-900">
                       {item.title}
                     </span>
-                    <span className="mt-0.5 line-clamp-2 max-w-2xl text-[12px] leading-snug text-slate-500">
+                    <span className="mt-1 line-clamp-2 max-w-2xl text-[12px] leading-snug text-slate-500">
                       {item.consequence}
                     </span>
-                    <span className="mt-1.5 flex flex-wrap items-center gap-1">
+                    <span className="mt-2 flex flex-wrap items-center gap-1.5">
                       {item.signals.map((signal) => (
                         <span
                           key={signal.label}
@@ -714,8 +718,8 @@ export function EmptyState({
         </ul>
       </div>
 
-      <div className="mt-5 shrink-0">
-        <div className="mb-2 flex items-baseline justify-between gap-3">
+      <div className="mt-7 shrink-0">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
             Workflows
           </p>
@@ -736,22 +740,31 @@ export function EmptyState({
                 type="button"
                 onClick={() => onOpenWorkflow(item.key)}
                 className={cn(
-                  "motion-interactive flex h-full w-full gap-2.5 px-3 py-2.5 text-left sm:py-3",
-                  "hover:bg-slate-50/80",
+                  "group motion-interactive flex h-full w-full gap-2.5 px-3.5 py-3.5 text-left sm:py-4",
+                  "transition-[background-color,box-shadow] duration-150",
+                  "hover:bg-blue-50/50 hover:shadow-[inset_0_0_0_1px_rgb(40_89_197/0.12)]",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35 focus-visible:ring-inset"
                 )}
               >
                 <WorkflowMark kind={item.key} />
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-baseline justify-between gap-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2859C5]">
+                  <span className="flex items-center justify-between gap-2">
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]",
+                        "border border-[#8FBFFA] text-[#2859C5]",
+                        "transition-[background-color,color,border-color,box-shadow] duration-150",
+                        "group-hover:border-[#2859C5] group-hover:bg-[#2859C5] group-hover:text-white",
+                        "group-hover:shadow-sm group-hover:shadow-blue-600/20"
+                      )}
+                    >
                       {item.verb}
                     </span>
-                    <span className="truncate text-[10px] tabular-nums text-slate-400">
+                    <span className="truncate text-[10px] tabular-nums text-slate-400 transition-colors group-hover:text-slate-500">
                       {item.meta}
                     </span>
                   </span>
-                  <span className="mt-0.5 block text-[13px] font-semibold tracking-tight text-slate-900">
+                  <span className="mt-0.5 block text-[13px] font-semibold tracking-tight text-slate-900 transition-colors group-hover:text-[#1e4aa8]">
                     {item.title}
                   </span>
                   <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">

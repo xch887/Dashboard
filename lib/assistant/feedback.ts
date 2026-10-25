@@ -1,7 +1,9 @@
 export type AIResponseFeedbackSource =
   | "assistant-response"
   | "insight-hover"
-  | "composer-prompt";
+  | "composer-prompt"
+  | "decision-flow"
+  | "workflow-setup";
 
 export type AIResponseFeedbackData = {
   responseId: string;

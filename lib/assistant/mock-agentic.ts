@@ -22,6 +22,16 @@ export type DecisionReasoningStep = {
   from: string;
 };
 
+/** A check the agent already ran — `Verify` opens the detail. */
+export type DecisionCheckedItem = {
+  label: string;
+  /** What was queried / compared. */
+  checked: string;
+  /** What came back. */
+  found: string;
+  source: string;
+};
+
 export type DecisionCase = {
   id: string;
   title: string;
@@ -33,7 +43,7 @@ export type DecisionCase = {
     headline: string;
     body: string;
     facts: { label: string; value: string }[];
-    alreadyChecked: string[];
+    alreadyChecked: DecisionCheckedItem[];
   };
   why: {
     headline: string;
@@ -85,9 +95,30 @@ export const DECISION_CASES: DecisionCase[] = [
         { label: "PACU float", value: "1 RN available" },
       ],
       alreadyChecked: [
-        "Pulled today’s OR board against the published first-case time",
-        "Compared PACU census to the last four Tuesdays",
-        "Confirmed Case 3 has no implant hold or anesthesia constraint",
+        {
+          label: "Pulled today’s OR board against the published first-case time",
+          checked:
+            "Matched today’s published first-case time to live board timestamps for cases 1–4.",
+          found:
+            "Board is +38 min vs published start; Case 1 and 2 already wheels-in late, Case 3–4 still queued.",
+          source: "OR schedule · Live board",
+        },
+        {
+          label: "Compared PACU census to the last four Tuesdays",
+          checked:
+            "Pulled PACU headcount and bed occupancy for this Tuesday vs the prior four.",
+          found:
+            "Census is within normal Tuesday band; one RN is floatable without emptying a bay.",
+          source: "PACU census",
+        },
+        {
+          label: "Confirmed Case 3 has no implant hold or anesthesia constraint",
+          checked:
+            "Reviewed Case 3 chart flags for implant hold, hard start, and anesthesia notes.",
+          found:
+            "Elective ortho, no implant hold, no hard-start marker — safest delay candidate.",
+          source: "OR board · Anesthesia notes",
+        },
       ],
     },
     why: {
@@ -183,9 +214,30 @@ export const DECISION_CASES: DecisionCase[] = [
         { label: "East ICU", value: "Quiet" },
       ],
       alreadyChecked: [
-        "Compared West retries to East ICU over the same six days",
-        "Ruled out a matching battery or wireless event",
-        "Confirmed biomed has a rollback image staged",
+        {
+          label: "Compared West retries to East ICU over the same six days",
+          checked:
+            "Aligned West ICU pump retry rates to East ICU over the six days since v2.14.",
+          found:
+            "West is 3.2× baseline; East is flat — spike tracks the West rollout only.",
+          source: "Telemetry · East ICU control",
+        },
+        {
+          label: "Ruled out a matching battery or wireless event",
+          checked:
+            "Scanned battery, Wi-Fi drop, and connectivity alarms on the same pumps.",
+          found:
+            "No matching spike on battery or wireless — points to firmware path, not power/radio.",
+          source: "Device telemetry",
+        },
+        {
+          label: "Confirmed biomed has a rollback image staged",
+          checked:
+            "Checked biomed image library for a pre-v2.14 package on West pumps.",
+          found:
+            "Rollback image is staged and tagged; night charge is not listed as owner.",
+          source: "Firmware audit log",
+        },
       ],
     },
     why: {
@@ -274,9 +326,30 @@ export const DECISION_CASES: DecisionCase[] = [
         { label: "Loaners", value: "Unconfirmed" },
       ],
       alreadyChecked: [
-        "Pulled last calibration dates against the ±2% vendor band",
-        "Asked inventory for four matching loaners — not confirmed",
-        "Estimated in-place cal window after last case",
+        {
+          label: "Pulled last calibration dates against the ±2% vendor band",
+          checked:
+            "Compared each 4 West sensor’s last cal date and live drift to the vendor ±2% band.",
+          found:
+            "Four sensors at ±2.8% drift; last vendor cal 92 days ago — past the 90-day edge.",
+          source: "Calibration records · Telemetry",
+        },
+        {
+          label: "Asked inventory for four matching loaners — not confirmed",
+          checked:
+            "Queried central inventory for four matching loaner units for overnight cover.",
+          found:
+            "No confirmed allotment yet — request is open, not rejected.",
+          source: "Inventory",
+        },
+        {
+          label: "Estimated in-place cal window after last case",
+          checked:
+            "Mapped biomed bay availability against tonight’s last-case time on 4 West.",
+          found:
+            "In-place batch cal fits after last case if a bay is locked now; later slips first case.",
+          source: "Biomed schedule · OR board",
+        },
       ],
     },
     why: {

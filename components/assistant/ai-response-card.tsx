@@ -41,21 +41,19 @@ export function AIResponseCard({
       className="rounded-2xl border border-slate-200/90 bg-white shadow-sm shadow-slate-900/[0.03] ring-1 ring-slate-100"
       aria-label="Assistant analysis"
     >
-      <div className="border-b border-slate-100 px-4 py-3 sm:px-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={cn(
-              "rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1",
-              confidenceStyles[data.confidence]
-            )}
-          >
-            Confidence · {data.confidence}
-          </span>
-        </div>
-        <p className="mt-2 text-[11px] leading-snug text-slate-500">
+      <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
+        <p className="min-w-0 flex-1 text-[11px] leading-snug text-slate-500">
           <span className="font-semibold text-slate-600">Reasoning scope:</span>{" "}
           {data.reasoning_label}
         </p>
+        <span
+          className={cn(
+            "shrink-0 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1",
+            confidenceStyles[data.confidence]
+          )}
+        >
+          Confidence · {data.confidence}
+        </span>
       </div>
 
       <div className="space-y-4 px-4 py-4 sm:px-5 sm:py-5">

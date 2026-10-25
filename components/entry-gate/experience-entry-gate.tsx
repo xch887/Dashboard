@@ -15,29 +15,32 @@ type ExperienceEntryGateProps = {
   onRequestEnter: () => void;
 };
 
-export const ExperienceEntryGate = forwardRef<HTMLDivElement, ExperienceEntryGateProps>(
-  function ExperienceEntryGate({ onRequestEnter }, ref) {
-    const reduceMotion = useReducedMotion();
-    const titleId = useId();
-    const descId = useId();
+export const ExperienceEntryGate = forwardRef<
+  HTMLDivElement,
+  ExperienceEntryGateProps
+>(function ExperienceEntryGate({ onRequestEnter }, ref) {
+  const reduceMotion = useReducedMotion();
+  const titleId = useId();
+  const descId = useId();
 
-    const tEnter = motionTransition(reduceMotion, "base");
-    const exitDuration = reduceMotion ? MOTION_DURATION.fast : MOTION_DURATION.slow;
+  const tEnter = motionTransition(reduceMotion, "base");
+  const exitDuration = reduceMotion ? MOTION_DURATION.fast : MOTION_DURATION.slow;
 
-    useEffect(() => {
-      document.getElementById(ENTRY_CTA_ID)?.focus();
-    }, []);
+  useEffect(() => {
+    document.getElementById(ENTRY_CTA_ID)?.focus();
+  }, []);
 
-    return (
+  return (
     <motion.div
       ref={ref}
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       aria-describedby={descId}
+      data-entry-gate=""
       className={cn(
         "fixed inset-0 z-[200] flex items-center justify-center overflow-hidden",
-        "bg-[#f8fafc] text-slate-900"
+        "bg-[#ecfdf5] text-slate-900"
       )}
       initial={{ opacity: 1, scale: 1 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -50,33 +53,28 @@ export const ExperienceEntryGate = forwardRef<HTMLDivElement, ExperienceEntryGat
         ease: MOTION_EASE.out,
       }}
     >
-      {/* Canvas: same blues as globals + primary-tinted washes (--primary #2563eb, --ring #3b82f6) */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(980px_480px_at_0%_-8%,rgb(37_99_235/0.11),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(980px_480px_at_0%_-8%,rgb(16_185_129/0.18),transparent_55%)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(720px_420px_at_100%_0%,rgb(59_130_246/0.08),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(720px_420px_at_100%_0%,rgb(5_150_105/0.12),transparent_50%)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(560px_380px_at_50%_100%,rgb(37_99_235/0.05),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(560px_380px_at_50%_100%,rgb(52_211_153/0.1),transparent_50%)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(680px_400px_at_100%_0%,rgb(14_165_233/0.06),transparent_52%)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(255_255_255/0.82)_0%,transparent_45%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(255_255_255/0.72)_0%,transparent_45%)]"
         aria-hidden
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[min(100%,36rem)] flex-col items-center px-6 py-12 sm:px-10">
         <motion.div
           className={cn(
-            "relative w-full overflow-hidden rounded-2xl border border-slate-200/90 p-8 shadow-[0_20px_50px_-24px_rgb(37_99_235/0.14)] ring-1 ring-blue-500/[0.07]",
-            "bg-gradient-to-b from-[rgb(239_246_255/0.85)] from-0% via-white via-35% to-white to-100%",
+            "relative w-full overflow-hidden rounded-2xl border border-emerald-200/80 p-8 shadow-[0_20px_50px_-24px_rgb(5_150_105/0.28)] ring-1 ring-emerald-500/[0.08]",
+            "bg-gradient-to-b from-[rgb(236_253_245/0.95)] from-0% via-white via-35% to-white to-100%",
             "sm:p-10 md:p-12"
           )}
           initial={{ opacity: 0, y: reduceMotion ? 0 : 10 }}
@@ -99,7 +97,7 @@ export const ExperienceEntryGate = forwardRef<HTMLDivElement, ExperienceEntryGat
             />
           </div>
           <div
-            className="mx-auto mb-6 h-1 w-14 rounded-full bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-sky-400 shadow-[0_0_20px_rgb(37_99_235/0.35)]"
+            className="mx-auto mb-6 h-1 w-14 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 shadow-[0_0_20px_rgb(16_185_129/0.4)]"
             aria-hidden
           />
           <h1
@@ -126,13 +124,13 @@ export const ExperienceEntryGate = forwardRef<HTMLDivElement, ExperienceEntryGat
                 type="button"
                 size="lg"
                 className={cn(
-                  "h-11 min-w-[11.5rem] rounded-lg px-8 text-sm font-semibold",
-                  "bg-gradient-to-b from-blue-500 to-blue-600 text-white",
-                  "shadow-md shadow-blue-600/25",
+                  "h-11 min-w-[14rem] rounded-lg px-8 text-sm font-semibold",
+                  "bg-gradient-to-b from-emerald-500 to-emerald-600 text-white",
+                  "shadow-md shadow-emerald-700/25",
                   "transition-[box-shadow,filter] duration-200",
-                  "hover:from-blue-500 hover:to-blue-500 hover:shadow-lg hover:shadow-blue-600/30 hover:brightness-105",
+                  "hover:from-emerald-500 hover:to-emerald-500 hover:shadow-lg hover:shadow-emerald-700/30 hover:brightness-105",
                   "active:brightness-95",
-                  "focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2"
+                  "focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2"
                 )}
                 onClick={onRequestEnter}
               >
@@ -146,8 +144,7 @@ export const ExperienceEntryGate = forwardRef<HTMLDivElement, ExperienceEntryGat
         </motion.div>
       </div>
     </motion.div>
-    );
-  }
-);
+  );
+});
 
 ExperienceEntryGate.displayName = "ExperienceEntryGate";

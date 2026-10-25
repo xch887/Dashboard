@@ -132,32 +132,41 @@ const ranks: Record<
   InsightRank,
   {
     icon: string;
-    bar: string;
     spark: string;
   }
 > = {
   lead: {
     icon: "bg-rose-500/12 text-rose-800",
-    bar: "bg-rose-500",
     spark: "bg-blue-500/75",
   },
   next: {
     icon: "bg-amber-500/12 text-amber-800",
-    bar: "bg-amber-500",
     spark: "bg-blue-500/75",
   },
   watch: {
     icon: "bg-teal-500/12 text-teal-800",
-    bar: "bg-teal-600",
     spark: "bg-blue-500/75",
   },
 };
 
-const insightCardClass =
-  "flex w-full flex-col rounded-xl border border-slate-200/80 bg-white p-3 text-left transition-[border-color,background-color,box-shadow] hover:border-slate-300 hover:bg-white hover:shadow-sm";
+const confidenceChipClass: Record<Insight["level"], string> = {
+  High: "bg-emerald-50 text-emerald-900 ring-emerald-200/80",
+  Med: "bg-amber-50 text-amber-950 ring-amber-200/70",
+};
 
-const insightActionButtonClass =
-  "motion-interactive h-7 w-full shrink-0 rounded-lg border-slate-200 bg-white text-[11px] font-medium text-slate-800 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98]";
+const insightCardClass = cn(
+  "group/insight flex w-full flex-col rounded-xl border border-slate-200/80 bg-white p-3 text-left",
+  "transition-[border-color,background-color,box-shadow] duration-150",
+  "hover:border-slate-300/90 hover:bg-slate-50/60 hover:shadow-sm"
+);
+
+const insightActionButtonClass = cn(
+  "motion-interactive h-7 w-full shrink-0 rounded-lg border border-[#8FBFFA] bg-white text-[11px] font-semibold text-[#2859C5] shadow-none",
+  "transition-[background-color,color,border-color,box-shadow,transform] duration-150",
+  "group-hover/insight:border-[#2859C5] group-hover/insight:bg-blue-50/80 group-hover/insight:text-[#1e4aa8]",
+  "hover:border-[#2859C5] hover:bg-[#2859C5] hover:text-white hover:shadow-sm hover:shadow-blue-600/20",
+  "active:scale-[0.98]"
+);
 
 const quickActions = [
   { label: "Daily ops report", icon: FileText },
@@ -227,34 +236,36 @@ export function AssistantInsightsRail() {
                               <Icon className="h-3.5 w-3.5" aria-hidden />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="flex items-start justify-between gap-2">
-                                <p className="text-[12px] font-semibold leading-snug text-slate-900">
-                                  {item.title}
-                                </p>
+                              <div className="flex items-start justify-between gap-1.5">
+                                <div className="min-w-0">
+                                  <p className="text-[12px] font-semibold leading-snug text-slate-900">
+                                    {item.title}
+                                  </p>
+                                  <div className="mt-0.5 flex flex-wrap items-center gap-1">
+                                    <span className="text-[9px] font-medium tabular-nums text-slate-400">
+                                      Confidence · {item.confidence}%
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "inline-flex items-center rounded px-1 py-px text-[8px] font-semibold uppercase leading-none tracking-[0.06em] ring-1",
+                                        confidenceChipClass[item.level]
+                                      )}
+                                    >
+                                      {item.level}
+                                    </span>
+                                  </div>
+                                </div>
                                 <Info
-                                  className="mt-0.5 h-3 w-3 shrink-0 text-slate-400"
+                                  className="mt-0.5 h-3 w-3 shrink-0 text-slate-400 transition-colors group-hover/insight:text-slate-500"
                                   aria-hidden
                                 />
                               </div>
-                              <p className="mt-0.5 text-[10px] font-medium leading-none text-slate-400">
-                                Confidence · {item.level} · {item.confidence}%
-                              </p>
                             </div>
                           </div>
 
                           <p className="mt-2 text-[12px] leading-snug text-slate-600">
                             {item.body}
                           </p>
-
-                          <div
-                            className="mt-2.5 h-1 overflow-hidden rounded-full bg-slate-100"
-                            aria-hidden
-                          >
-                            <div
-                              className={cn("h-full rounded-full", T.bar)}
-                              style={{ width: `${item.confidence}%` }}
-                            />
-                          </div>
                         </div>
                       </HoverCardTrigger>
                       <HoverCardContent
@@ -363,7 +374,7 @@ export function AssistantInsightsRail() {
                       </HoverCardContent>
                     </HoverCard>
 
-                    <div className="mt-2.5 border-t border-slate-100 pt-2.5">
+                    <div className="mt-2.5 border-t border-slate-100 pt-2.5 transition-colors group-hover/insight:border-slate-200/90">
                       <Button
                         type="button"
                         variant="outline"

@@ -1,9 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { AIResponseFeedback } from "@/components/assistant/ai-response-feedback";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   decisionCaseById,
   type DecisionCase,
+  type DecisionCheckedItem,
   type DecisionOption,
 } from "@/lib/assistant/mock-agentic";
 import { cn } from "@/lib/utils";
@@ -12,7 +22,7 @@ import { ArrowLeft, Check, Database } from "lucide-react";
 const STEPS = [
   { id: "situation", label: "What’s going on" },
   { id: "why", label: "Why it matters" },
-  { id: "decide", label: "Your call" },
+  { id: "decide", label: "Choose a path" },
 ] as const;
 
 type StepId = (typeof STEPS)[number]["id"];
@@ -153,6 +163,9 @@ export function DecisionFlow({
     decision.options.find((o) => o.recommended)?.id ?? null
   );
   const [done, setDone] = useState(false);
+  const [verifyItem, setVerifyItem] = useState<DecisionCheckedItem | null>(
+    null
+  );
 
   const stepIndex = STEPS.findIndex((s) => s.id === step);
   const selected = decision.options.find((o) => o.id === picked) ?? null;
@@ -244,12 +257,6 @@ export function DecisionFlow({
                     {s.label}
                   </span>
                 </button>
-                {i < STEPS.length - 1 ? (
-                  <span
-                    className="hidden h-px w-3 shrink-0 bg-slate-200 sm:block"
-                    aria-hidden
-                  />
-                ) : null}
               </li>
             );
           })}
@@ -339,17 +346,26 @@ export function DecisionFlow({
                     <p className="text-[11px] font-semibold text-slate-700">
                       Already checked
                     </p>
-                    <ul className="mt-2 space-y-1.5">
-                      {decision.situation.alreadyChecked.map((line) => (
+                    <ul className="mt-2 space-y-2">
+                      {decision.situation.alreadyChecked.map((item) => (
                         <li
-                          key={line}
-                          className="flex gap-2 text-[13px] leading-snug text-slate-600"
+                          key={item.label}
+                          className="flex items-start gap-2 text-[13px] leading-snug text-slate-600"
                         >
                           <Check
                             className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2859C5]"
                             strokeWidth={2}
                           />
-                          {line}
+                          <span className="min-w-0 flex-1">
+                            {item.label}{" "}
+                            <button
+                              type="button"
+                              onClick={() => setVerifyItem(item)}
+                              className="font-semibold text-[#2859C5] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+                            >
+                              Verify
+                            </button>
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -384,7 +400,7 @@ export function DecisionFlow({
                 <div className="space-y-4">
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                      Your call
+                      Choose a path
                     </p>
                     <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-slate-900">
                       Pick a path before first case
@@ -473,35 +489,98 @@ export function DecisionFlow({
         </div>
       </div>
 
-      {!done ? (
-        <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 sm:px-5">
-          <button
-            type="button"
-            onClick={step === "situation" ? onBack : goPrev}
-            className="motion-interactive h-9 rounded-lg px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
-          >
-            {step === "situation" ? "Cancel" : "Back"}
-          </button>
-          {step !== "decide" ? (
-            <button
-              type="button"
-              onClick={goNext}
-              className="motion-interactive h-9 rounded-lg bg-[#2859C5] px-4 text-sm font-semibold text-white hover:bg-[#1e4aa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
-            >
-              Continue
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={commit}
-              disabled={!picked}
-              className="motion-interactive h-9 rounded-lg bg-[#2859C5] px-4 text-sm font-semibold text-white hover:bg-[#1e4aa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35 disabled:opacity-40"
-            >
-              Confirm path
-            </button>
-          )}
-        </footer>
-      ) : null}
+      <footer className="shrink-0 border-t border-slate-100 bg-white px-4 py-3 sm:px-5">
+        <AIResponseFeedback
+          responseId={`decision:${decision.id}`}
+          source="decision-flow"
+          className="mt-0 border-t-0 pt-0"
+          actions={
+            !done ? (
+              <>
+                <button
+                  type="button"
+                  onClick={step === "situation" ? onBack : goPrev}
+                  className="motion-interactive h-9 rounded-lg px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+                >
+                  {step === "situation" ? "Cancel" : "Back"}
+                </button>
+                {step !== "decide" ? (
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    className="motion-interactive h-9 rounded-lg bg-[#2859C5] px-4 text-sm font-semibold text-white hover:bg-[#1e4aa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35"
+                  >
+                    Continue
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={commit}
+                    disabled={!picked}
+                    className="motion-interactive h-9 rounded-lg bg-[#2859C5] px-4 text-sm font-semibold text-white hover:bg-[#1e4aa8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/35 disabled:opacity-40"
+                  >
+                    Confirm path
+                  </button>
+                )}
+              </>
+            ) : null
+          }
+        />
+      </footer>
+
+      <Dialog
+        open={verifyItem != null}
+        onOpenChange={(open) => {
+          if (!open) setVerifyItem(null);
+        }}
+      >
+        <DialogContent className="max-w-md gap-0 p-0 sm:max-w-md">
+          {verifyItem ? (
+            <>
+              <DialogHeader className="border-b border-slate-100 px-5 py-4 pr-12">
+                <DialogTitle className="text-[15px] font-semibold leading-snug text-slate-900">
+                  Verify check
+                </DialogTitle>
+                <DialogDescription className="mt-1 text-[13px] leading-snug text-slate-600">
+                  {verifyItem.label}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 px-5 py-4">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    What we checked
+                  </p>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-700">
+                    {verifyItem.checked}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                    What we found
+                  </p>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-700">
+                    {verifyItem.found}
+                  </p>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  Source · {verifyItem.source}
+                </p>
+              </div>
+              <div className="flex justify-end border-t border-slate-100 px-5 py-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="border-slate-200 bg-white shadow-none"
+                  onClick={() => setVerifyItem(null)}
+                >
+                  Done
+                </Button>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

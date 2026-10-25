@@ -1,10 +1,10 @@
 /**
- * Session gate for the full-screen entry experience (any first load in the app).
- * Wired in root layout via `EntryGateProvider`. After continue from `/`, the app
- * navigates to `/assistant`. Other URLs stay put.
+ * Session gate for the full-screen green MediSync launcher.
+ * Wired in root layout via `EntryGateProvider`. Landing on `/` shows the gate;
+ * after continue, the app navigates to `/assistant`. Other URLs stay put once entered.
  *
  * Testing:
- * - Append `?intro=1` to `/` to force the intro even if already entered this session.
+ * - Open `/` or `/?intro=1` to force the launcher even if already entered this session.
  * - Clear session: DevTools → Application → Session storage → remove `med-dash-experience-entered`
  *   or `sessionStorage.removeItem(ENTRY_GATE_SESSION_KEY)` in the console.
  */

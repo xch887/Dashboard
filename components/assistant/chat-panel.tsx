@@ -347,7 +347,7 @@ export function ChatPanel() {
                 "relative flex min-h-0 flex-1 flex-col overflow-hidden"
               )}
             >
-                <header className="flex shrink-0 items-center justify-between gap-3 px-5 pb-2.5 pt-3.5 sm:px-6 sm:pb-3 sm:pt-4 lg:px-7">
+                <header className="flex shrink-0 items-center justify-between gap-3 px-5 pb-3.5 pt-4 sm:px-6 sm:pb-4 sm:pt-5 lg:px-7">
                   <div className="flex min-w-0 items-center gap-2.5">
                     <Image
                       src={ASSISTANT_HERO_ICON}
@@ -376,7 +376,7 @@ export function ChatPanel() {
                   </p>
                 </header>
 
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 sm:px-6 lg:px-7">
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 pb-2 sm:px-6 lg:px-7">
                   <EmptyState
                     onOpenDecision={openDecision}
                     onOpenWorkflow={openWorkflow}

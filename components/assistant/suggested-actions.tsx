@@ -55,24 +55,35 @@ export function SuggestedActions({
             <li key={a.id}>
               <div
                 className={cn(
-                  "motion-interactive rounded-xl border bg-white px-3 py-2.5 shadow-sm ring-1",
+                  "group motion-interactive rounded-xl border bg-white px-3 py-2.5 ring-1 transition-[background-color,border-color,box-shadow] duration-150",
                   isPending
                     ? "border-blue-200 ring-blue-100"
-                    : "border-slate-200/90 ring-slate-100 hover:border-slate-300/90 hover:shadow-md hover:ring-slate-200/90"
+                    : cn(
+                        "border-slate-200/90 ring-slate-100",
+                        "hover:border-[#2859C5]/[0.25] hover:bg-blue-50/40 hover:ring-[#2859C5]/[0.12]",
+                        "hover:shadow-[inset_0_0_0_1px_rgb(40_89_197/0.08)]"
+                      )
                 )}
               >
                 <div className="flex flex-wrap items-start gap-2">
-                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-600 ring-1 ring-slate-200/80">
+                  <span
+                    className={cn(
+                      "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 transition-[background-color,color,box-shadow] duration-150",
+                      isPending
+                        ? "bg-blue-50 text-[#2859C5] ring-blue-200/80"
+                        : "bg-slate-50 text-slate-600 ring-slate-200/80 group-hover:bg-[#2859C5]/[0.1] group-hover:text-[#2859C5] group-hover:ring-[#2859C5]/[0.2]"
+                    )}
+                  >
                     <Icon className="h-4 w-4" strokeWidth={2} aria-hidden />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-900">
+                    <p className="text-sm font-semibold text-slate-900 transition-colors group-hover:text-[#1e4aa8]">
                       {a.label}
                     </p>
                     <p className="mt-0.5 text-[11px] leading-snug text-slate-500">
                       {a.description}
                     </p>
-                    <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                    <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-slate-400 transition-colors group-hover:text-[#2859C5]">
                       {WORKFLOW_LABELS[a.workflow]}
                     </p>
                   </div>
@@ -81,10 +92,14 @@ export function SuggestedActions({
                     size="sm"
                     variant={isPending ? "outline" : "default"}
                     className={cn(
-                      "h-8 shrink-0 px-3 text-xs font-semibold active:scale-[0.98]",
+                      "h-8 shrink-0 px-3 text-xs font-semibold shadow-none active:scale-[0.98]",
                       isPending
                         ? "border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50"
-                        : "border-transparent bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-sm hover:from-blue-500 hover:to-blue-500"
+                        : cn(
+                            "border-transparent bg-[#2859C5] text-white",
+                            "hover:bg-[#1e4aa8]",
+                            "group-hover:bg-[#1e4aa8]"
+                          )
                     )}
                     disabled={disabled}
                     onClick={() => onSelect(a)}
@@ -105,7 +120,7 @@ export function SuggestedActions({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-8"
+                      className="h-8 shadow-none"
                       onClick={onCancel}
                     >
                       Cancel
@@ -113,7 +128,7 @@ export function SuggestedActions({
                     <Button
                       type="button"
                       size="sm"
-                      className="h-8 border-transparent bg-gradient-to-b from-blue-500 to-blue-600 px-3 text-xs font-semibold text-white shadow-sm hover:from-blue-500 hover:to-blue-500 active:scale-[0.98]"
+                      className="h-8 border-transparent bg-[#2859C5] px-3 text-xs font-semibold text-white shadow-none hover:bg-[#1e4aa8] active:scale-[0.98]"
                       onClick={() => onConfirm(pendingAction)}
                     >
                       Confirm
