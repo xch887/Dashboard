@@ -1,5 +1,5 @@
 /**
- * Session gate for the full-screen green MediSync launcher.
+ * Session gate for the full-screen MediSync launcher.
  * Wired in root layout via `EntryGateProvider`. Landing on `/` shows the gate;
  * after continue, the app navigates to `/assistant`. Other URLs stay put once entered.
  *
