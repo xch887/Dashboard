@@ -43,7 +43,7 @@ export function EntryGateProvider({
   useLayoutEffect(() => {
     const path = window.location.pathname;
     const search = window.location.search;
-    // Root launch URL always opens the green MediSync launcher.
+    // Root launch URL always opens the MediSync launcher.
     if (path === "/" || path === "") {
       try {
         sessionStorage.removeItem(ENTRY_GATE_SESSION_KEY);
@@ -81,7 +81,7 @@ export function EntryGateProvider({
       {children}
       {overlay === "unknown" ? (
         <div
-          className="fixed inset-0 z-[200] bg-[radial-gradient(900px_440px_at_0%_-6%,rgb(16_185_129/0.14),transparent_55%),linear-gradient(180deg,#ecfdf5_0%,#d1fae5_100%)]"
+          className="fixed inset-0 z-[200] bg-[radial-gradient(900px_440px_at_0%_-6%,rgb(37_99_235/0.08),transparent_55%),linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)]"
           aria-hidden
         />
       ) : null}

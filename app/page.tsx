@@ -1,5 +1,5 @@
 /**
- * Launch route — EntryGateProvider shows the green MediSync launcher here.
+ * Launch route — EntryGateProvider shows the MediSync launcher here.
  * After continue, the gate navigates to `/assistant`.
  */
 export default function Home() {
